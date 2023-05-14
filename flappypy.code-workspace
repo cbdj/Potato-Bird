@@ -7,8 +7,12 @@
 	"settings": {},
     "launch": {
         "version": "0.2.0",
-        "configurations": []
-    },
-    "python.autoComplete.extraPaths": [
-        "C:\\Users\\cldej\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\mediapipe" ]
+        "configurations": [{
+            "name": "Python: flap.py",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/flap.py",
+            "args" : ["--port", "1593"]
+        },]
+    }
 }

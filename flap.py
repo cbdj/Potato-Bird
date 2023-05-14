@@ -56,9 +56,9 @@ class App:
                 else:
                     self.sprite_handler.on_key_press(e.key)
             elif e.type == EVENT_DAY_NIGHT:
-                if self.sprite_handler.started : 
+                if self.sprite_handler._started and not self.sprite_handler._paused: 
                     self.sprite_handler.toggle_day()
-                    self.speed = 1.5*self.speed
+                    self.speed = SPEED_INCREASE_FACTOR*self.speed
                     self.sprite_handler.update_speed(self.speed)
 
     def run(self):

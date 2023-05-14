@@ -1,15 +1,20 @@
 import pygame as pg
 from random import randrange
-from pygame._sdl2.video import Image
+from pygame._sdl2.video import Image, Texture
+from pygame import mask
 
 class SpriteUnit(pg.sprite.Sprite):
     def __init__(self, handler, image, x, y):
         super().__init__()
         self.handler = handler
-        self.update_image(image)
+        self.mask = mask.from_surface(image)
+        self.image = Image(Texture.from_surface(self.handler.renderer, image))
+        self.rect = self.image.get_rect()
+        self.orig_rect = self.rect.copy()
         self.orig_x, self.orig_y = x, y
         self.x, self.y = x, y
         self.vel_x, self.vel_y = 0, 0
+        self.rect.center = self.x, self.y
 
     def translate(self):
         self.x += self.vel_x * self.handler.app.dt
@@ -20,6 +25,4 @@ class SpriteUnit(pg.sprite.Sprite):
         self.translate()
 
     def update_image(self, image):
-        self.image = Image(image)
-        self.rect = self.image.get_rect()
-        self.orig_rect = self.rect.copy()
+        self.image = Image(Texture.from_surface(self.handler.renderer, image))

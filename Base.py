@@ -1,4 +1,3 @@
-
 from SpriteUnit import SpriteUnit
 
 class Base(SpriteUnit):
