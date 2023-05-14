@@ -25,4 +25,4 @@ class SpriteUnit(pg.sprite.Sprite):
         self.translate()
 
     def update_image(self, image):
-        self.image = Image(Texture.from_surface(self.handler.renderer, image))
+        self.image = image
