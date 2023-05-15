@@ -34,4 +34,4 @@ class Bird(SpriteUnit):
     def update(self):
         self.translate() 
         if pg.sprite.spritecollideany(self, self.handler.group_collide, pg.sprite.collide_mask):
-            self.handler.pause()
+            self.handler.game_over()

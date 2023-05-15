@@ -9,6 +9,7 @@ from pygame._sdl2.video import Image, Texture
 import pathlib
 from random import randrange, uniform
 from SpriteUnit import SpriteUnit
+import time
 
 class SpriteHandler:
     def __init__(self, app):
@@ -34,7 +35,7 @@ class SpriteHandler:
 
         # Creating menu
         self.menu = SpriteUnit(self,self.images['message'], WIN_W // 2, WIN_H // 2)
-        self.gameover = SpriteUnit(self,self.images['gameover'], WIN_W // 2, WIN_H // 2)
+        self._gameover = SpriteUnit(self,self.images['gameover'], WIN_W // 2, WIN_H // 2)
         self.score=Score(self,self.images, WIN_W // 2, WIN_H //6)
 
         # Creating groups
@@ -191,8 +192,8 @@ class SpriteHandler:
         self.update_speed(0)
         self._started = False
 
-    def pause(self):
-        self.group_foreground.add(self.gameover)
+    def game_over(self):
+        self.group_foreground.add(self._gameover)
         self.score.save_best()
         self.update_speed(0)
         self._paused = True
