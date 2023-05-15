@@ -16,6 +16,7 @@ class SpriteHandler:
         self.app = app
         self.renderer = self.app.renderer
         self.images = self.load_images() # load textures from *.jpg
+        self.sounds = self.load_sounds()
         # Creating backgrounds sprites
         self.background = Background(self, self.images['background-day'], self.images['background-night'], WIN_W//2, WIN_H//2)
             
@@ -103,8 +104,12 @@ class SpriteHandler:
         images['background-day'] = extend_image(images['background-day'], WIN_W)
         images['background-night'] = extend_image(images['background-night'], WIN_W)
         images['base'] = extend_image(images['base'], 2*WIN_W)
-        
         return images
+
+    def load_sounds(self):
+        """ from .ogg to pygame Sound """
+        sounds = dict([(path.stem, pg.mixer.Sound(str(path))) for path in pathlib.Path(AUDIO_DIR_PATH).rglob('*.ogg') if path.is_file()])
+        return sounds
 
 
     def maybe_requeue_pipes(self):
@@ -131,6 +136,7 @@ class SpriteHandler:
     def update_score(self):
         for (pipe1,pipe2) in self.pipes:
             if pipe1.x < WIN_W//2 and not pipe1.point_given:
+                self.sounds['point'].play()
                 self.score.increment()
                 pipe1.point_given = True
             if pipe1.x > WIN_W//2:

@@ -12,6 +12,7 @@ except Exception:
 WIN_SIZE = WIN_W, WIN_H = 1280, 512
 ASSETS_DIR_PATH = base_path + '/assets'
 SPRITE_DIR_PATH = ASSETS_DIR_PATH + '/sprites'
+AUDIO_DIR_PATH = ASSETS_DIR_PATH + '/audio'
 PIPE_DENSITY = 6
 BUMP_SPEED = 300
 FONT_SIZE = 20

@@ -65,6 +65,7 @@ class App:
                     self.sprite_handler.background.toggle_day_night()
                     self.speed = SPEED_INCREASE_FACTOR*self.speed
                     self.sprite_handler.update_speed(self.speed)
+                    self.sprite_handler.sounds['swoosh'].play()
 
     def run(self):
         while self.running:

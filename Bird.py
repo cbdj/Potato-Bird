@@ -30,8 +30,11 @@ class Bird(SpriteUnit):
 
     def bump(self, speed):
         self.vel_y = -speed
+        self.handler.sounds['wing'].play()
 
     def update(self):
         self.translate() 
         if pg.sprite.spritecollideany(self, self.handler.group_collide, pg.sprite.collide_mask):
+            self.handler.sounds['hit'].play()
+            self.handler.sounds['die'].play()
             self.handler.game_over()
