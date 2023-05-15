@@ -15,7 +15,7 @@ class Bird(SpriteUnit):
     def translate(self):
         self.vel_y = self.vel_y  + 9.81*1000*self.mass*self.handler.app.dt
         self.y += self.vel_y * self.handler.app.dt
-        if self.y < 0 or self.y > WIN_H-50:
+        if self.y < 0 :
             self.vel_y *= -1
         self.rect.center = self.x, self.y
         if self.vel_y > BUMP_SPEED//10:
@@ -34,7 +34,8 @@ class Bird(SpriteUnit):
 
     def update(self):
         self.translate() 
-        if pg.sprite.spritecollideany(self, self.handler.group_collide, pg.sprite.collide_mask):
+        if  self.y > WIN_H - self.handler.base.image.get_rect().height or pg.sprite.spritecollideany(self, self.handler.group_collide, pg.sprite.collide_mask):
             self.handler.sounds['hit'].play()
             self.handler.sounds['die'].play()
             self.handler.game_over()
+            
