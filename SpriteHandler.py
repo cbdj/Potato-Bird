@@ -3,8 +3,9 @@ from Background import Background
 from Base import Base
 from Pipe import Pipe
 from Bird import Bird
+from Score import Score
 import pygame as pg
-from pygame._sdl2.video import Image
+from pygame._sdl2.video import Image, Texture
 import pathlib
 from random import randrange, uniform
 from SpriteUnit import SpriteUnit
@@ -14,7 +15,6 @@ class SpriteHandler:
         self.app = app
         self.renderer = self.app.renderer
         self.images = self.load_images() # load textures from *.jpg
-
         # Creating backgrounds sprites
         self.background = Background(self, self.images['background-day'], self.images['background-night'], WIN_W//2, WIN_H//2)
             
@@ -35,12 +35,13 @@ class SpriteHandler:
         # Creating menu
         self.menu = SpriteUnit(self,self.images['message'], WIN_W // 2, WIN_H // 2)
         self.gameover = SpriteUnit(self,self.images['gameover'], WIN_W // 2, WIN_H // 2)
+        self.score=Score(self,self.images, WIN_W // 2, WIN_H //6)
 
         # Creating groups
         self.group_background = pg.sprite.GroupSingle(self.background)
         self.group_collide = pg.sprite.Group(self.pipes, self.base) # special group for sprites that Bird can collide on
         self.group_bird = pg.sprite.GroupSingle(self.bird)
-        self.group_foreground = pg.sprite.Group()
+        self.group_foreground = pg.sprite.Group(self.score)
         
         self._started = False
         self._paused = False
@@ -55,12 +56,15 @@ class SpriteHandler:
         self._started = False
         self._paused = False
         self.background.reset()
+        self.score.reset()
+        self.score.display_best()
         self.bird.x = self.bird.orig_x
         self.bird.y = self.bird.orig_y 
         for pipe, pipe_reversed in self.pipes:
             pipe.x = pipe_reversed.x = pipe.orig_x
+            pipe.point_given = True
         self.group_foreground.empty()
-        self.group_foreground.add(self.menu)
+        self.group_foreground.add(self.menu, self.score)
         self.update_speed(SPEED)
         self.app.dt=0.0
         self.group_background.update()
@@ -69,7 +73,7 @@ class SpriteHandler:
         self.group_foreground.update()
            
     def count_sprites(self):
-        return len(self.group_bird) + len(self.group_collide) + len(self.group_background)
+        return len(self.group_bird) + len(self.group_collide) + len(self.group_background) + len(self.group_foreground)
 
     def rand_pipe_requeue_interval(self, speed):
         interval = uniform(2.0,8.0)*(1000.0*(float(self.pipe_width))//float(speed))*0.001
@@ -101,20 +105,18 @@ class SpriteHandler:
         
         return images
 
-    def pipe_requeue(self, pipe, pipe_reversed):
-        """ 
-        Reque pipes 
-        Used when pipes are out of camera range
-        """
-        pipe.y = pipe.orig_y - randrange(pipe.rect.height//4, pipe.rect.height//2)
-        pipe_reversed.y = pipe_reversed.orig_y + randrange(pipe.rect.height//4, pipe.rect.height//2)
-        pipe.x = pipe_reversed.x = WIN_W + pipe.rect.width//2
 
-    def update(self):
-        if self._paused:
-            return
-        if not self._started:
-            return
+    def maybe_requeue_pipes(self):
+
+        def pipe_requeue(pipe, pipe_reversed):
+            """ 
+            Reque pipes 
+            Used when pipes are out of camera range
+            """
+            pipe.y = pipe.orig_y - randrange(pipe.rect.height//4, pipe.rect.height//2)
+            pipe_reversed.y = pipe_reversed.orig_y + randrange(pipe.rect.height//4, pipe.rect.height//2)
+            pipe.x = pipe_reversed.x = WIN_W + pipe.rect.width//2
+
         self.pipe_reque_time += self.app.dt
         if self.pipe_reque_time > self.pipe_requeue_interval:
             for (pipe1,pipe2) in self.pipes:
@@ -122,8 +124,25 @@ class SpriteHandler:
                     # requeue one Pipe that is out of screen
                     self.pipe_reque_time = 0.0
                     self.pipe_requeue_interval = self.rand_pipe_requeue_interval(-pipe1.vel_x)
-                    self.pipe_requeue(pipe1, pipe2)
+                    pipe_requeue(pipe1, pipe2)
                     break
+
+    def update_score(self):
+        for (pipe1,pipe2) in self.pipes:
+            if pipe1.x < WIN_W//2 and not pipe1.point_given:
+                self.score.increment()
+                pipe1.point_given = True
+            if pipe1.x > WIN_W//2:
+                pipe1.point_given = False
+
+
+    def update(self):
+        if self._paused:
+            return
+        if not self._started:
+            return
+        self.update_score()
+        self.maybe_requeue_pipes()
                 
         # Update bird's wings position
        
@@ -162,7 +181,9 @@ class SpriteHandler:
 
     def start(self):
         self.app.speed=SPEED
+        self.score.reset()
         self.group_foreground.empty()
+        self.group_foreground.add(self.score)
         self.update_speed(SPEED)
         self._started = True
 
@@ -172,5 +193,9 @@ class SpriteHandler:
 
     def pause(self):
         self.group_foreground.add(self.gameover)
+        self.score.save_best()
         self.update_speed(0)
         self._paused = True
+
+    def quit(self):
+        self.score.save_best()

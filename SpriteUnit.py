@@ -26,3 +26,5 @@ class SpriteUnit(pg.sprite.Sprite):
 
     def update_image(self, image):
         self.image = image
+        self.rect = self.image.get_rect()
+        self.rect.center = self.x, self.y

@@ -10,7 +10,8 @@ from pygame._sdl2.video import Window, Renderer, Texture
 class App:
     def __init__(self):
         pg.init()
-        self.window = Window(size=WIN_SIZE)
+        self.window = Window(size=WIN_SIZE, title='flap.py')
+        self.window.set_icon(pg.image.load(ASSETS_DIR_PATH +'/favicon.ico'))
         self.renderer = Renderer(self.window)
         self.renderer.draw_color = (0, 0, 0, 255)
         self.clock = pg.time.Clock()
@@ -18,7 +19,6 @@ class App:
         self.dt = 0.0
         self.font = ft.SysFont('Verdana', FONT_SIZE)
         self.fps_size = [FONT_SIZE * 13, FONT_SIZE]
-        self.fps_surf = pg.Surface(self.fps_size)
         pg.time.set_timer(EVENT_DAY_NIGHT, DAY_NIGHT_TIME_MS)
         self.speed = SPEED
         self.running = True
@@ -29,11 +29,16 @@ class App:
         self.dt = self.clock.tick(60) * 0.001
 
     def draw_fps(self):
-        self.fps_surf.fill('black')
         fps = f'{self.clock.get_fps() :.0f} FPS | {self.sprite_handler.count_sprites()} SPRITES'
-        self.font.render_to(self.fps_surf, (0, 0), text=fps, fgcolor='green', bgcolor='black')
-        tex = Texture.from_surface(self.renderer, self.fps_surf)
-        tex.draw((0, 0, *self.fps_size), (0, 0, *self.fps_size))
+        surf_black, rect = self.font.render(text=fps, fgcolor='black')
+        surf, rect = self.font.render(text=fps, fgcolor='green')
+        tex1 = Texture.from_surface(self.renderer, surf_black)
+        tex2 = Texture.from_surface(self.renderer, surf)
+        tex1.draw(tex1.get_rect(),(2,0,tex1.width, tex1.height))
+        tex1.draw(tex1.get_rect(),(0,2,tex1.width, tex1.height))
+        tex1.draw(tex1.get_rect(),(-2,0,tex1.width, tex1.height))
+        tex1.draw(tex1.get_rect(),(0,-2,tex1.width, tex1.height))
+        tex2.draw(tex1.get_rect(),(0,0,tex1.width, tex1.height))
 
     def draw(self):
         self.renderer.clear()
@@ -66,6 +71,7 @@ class App:
             self.check_events()
             self.update()
             self.draw()
+        self.sprite_handler.quit()
         pg.quit()
 
 if __name__ == '__main__':
