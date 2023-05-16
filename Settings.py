@@ -2,10 +2,26 @@ import pygame as pg
 import sys
 import os
 
-try:
-# PyInstaller creates a temp folder and stores path in _MEIPASS
-    base_path = sys._MEIPASS
-except Exception:
+from sys import platform as _sys_platform
+from os import environ
+
+def get_platform():
+    if 'ANDROID_ARGUMENT' in environ:
+        return "android"
+    elif _sys_platform in ('linux', 'linux2','linux3'):
+        return "linux"
+    elif _sys_platform in ('win32', 'cygwin'):
+        return 'win'
+platform = get_platform()
+if platform=="android":
+    base_path=os.path.abspath("/data/data/org.test.flappy/files/app/")
+elif platform=="win":
+    try:
+    # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+elif platform=="linux":
     base_path = os.path.abspath(".")
 
 # Those two settings will be identified at app startup depending on screen resolution and assets dimensions

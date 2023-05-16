@@ -11,7 +11,7 @@
             "name": "Python: flap.py",
             "type": "python",
             "request": "launch",
-            "program": "${workspaceFolder}/flap.py",
+            "program": "${workspaceFolder}/main.py",
             "args" : ["--port", "1593"]
         },]
     }

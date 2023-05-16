@@ -7,6 +7,7 @@ import pygame.freetype as ft
 import sys
 from pygame._sdl2.video import Window, Renderer, Texture     
 
+
 class App:
     def __init__(self):
         pg.init()
