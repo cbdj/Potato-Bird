@@ -1,6 +1,6 @@
 import pathlib
 from random import randrange
-from Settings import *
+import Settings
 from SpriteHandler import SpriteHandler
 import pygame as pg
 import pygame.freetype as ft
@@ -10,17 +10,18 @@ from pygame._sdl2.video import Window, Renderer, Texture
 class App:
     def __init__(self):
         pg.init()
-        self.window = Window(size=WIN_SIZE, title='flap.py')
-        self.window.set_icon(pg.image.load(ASSETS_DIR_PATH +'/favicon.ico'))
+        screen_info = pg.display.Info()
+        self.window = Window(title='flap.py', size=(screen_info.current_w,screen_info.current_h))
+        self.window.set_icon(pg.image.load(Settings.ASSETS_DIR_PATH +'/favicon.ico'))
         self.renderer = Renderer(self.window)
-        self.renderer.draw_color = (0, 0, 0, 255)
-        self.clock = pg.time.Clock()
         self.sprite_handler = SpriteHandler(self)
+        self.renderer.scale = (self.sprite_handler.scale, self.sprite_handler.scale)
+        self.clock = pg.time.Clock()
         self.dt = 0.0
-        self.font = ft.SysFont('Verdana', FONT_SIZE)
-        self.fps_size = [FONT_SIZE * 13, FONT_SIZE]
-        pg.time.set_timer(EVENT_DAY_NIGHT, DAY_NIGHT_TIME_MS)
-        self.speed = SPEED
+        self.font = ft.SysFont('Verdana', Settings.FONT_SIZE)
+        self.fps_size = [Settings.FONT_SIZE * 13, Settings.FONT_SIZE]
+        pg.time.set_timer(Settings.EVENT_DAY_NIGHT, Settings.DAY_NIGHT_TIME_MS)
+        self.speed = Settings.SPEED
         self.running = True
         self.display_fps = False
 
@@ -60,10 +61,10 @@ class App:
                     self.display_fps = not self.display_fps
                 else:
                     self.sprite_handler.on_key_press(e.key)
-            elif e.type == EVENT_DAY_NIGHT:
+            elif e.type == Settings.EVENT_DAY_NIGHT:
                 if self.sprite_handler._started and not self.sprite_handler._paused: 
                     self.sprite_handler.background.toggle_day_night()
-                    self.speed = SPEED_INCREASE_FACTOR*self.speed
+                    self.speed = Settings.SPEED_INCREASE_FACTOR*self.speed
                     self.sprite_handler.update_speed(self.speed)
                     self.sprite_handler.sounds['swoosh'].play()
 

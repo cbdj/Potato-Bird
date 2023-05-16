@@ -8,8 +8,8 @@ try:
 except Exception:
     base_path = os.path.abspath(".")
 
-# WIN_SIZE = WIN_W, WIN_H = 336, 512
-WIN_SIZE = WIN_W, WIN_H = 1280, 512
+WIN_W = 0
+WIN_H = 0
 ASSETS_DIR_PATH = base_path + '/assets'
 SPRITE_DIR_PATH = ASSETS_DIR_PATH + '/sprites'
 AUDIO_DIR_PATH = ASSETS_DIR_PATH + '/audio'
