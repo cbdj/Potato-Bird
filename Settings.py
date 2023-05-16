@@ -8,8 +8,11 @@ try:
 except Exception:
     base_path = os.path.abspath(".")
 
+# Those two settings will be identified at app startup depending on screen resolution and assets dimensions
 WIN_W = 0
 WIN_H = 0
+
+# CONSTANTS
 ASSETS_DIR_PATH = base_path + '/assets'
 SPRITE_DIR_PATH = ASSETS_DIR_PATH + '/sprites'
 AUDIO_DIR_PATH = ASSETS_DIR_PATH + '/audio'

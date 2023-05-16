@@ -18,6 +18,7 @@ class SpriteHandler:
         self.images = self.load_images() # load textures from *.jpg
         self.sounds = self.load_sounds()
 
+        # Adapting dimensions to screen resolution
         Settings.WIN_W, Settings.WIN_H = self.compute_size()
         screen_info = pg.display.Info()
         scale_w= screen_info.current_w/Settings.WIN_W
@@ -25,6 +26,7 @@ class SpriteHandler:
         self.scale = min(scale_w, scale_h)
         Settings.WIN_W = float(Settings.WIN_W)*float(screen_info.current_w)//(float(Settings.WIN_W)*self.scale)
         self.extend_world(Settings.WIN_W)
+
         # Creating backgrounds sprites
         self.background = Background(self, self.images['background-day'], self.images['background-night'], Settings.WIN_W//2, (Settings.WIN_H-self.images['base'].get_height())//2 )
             

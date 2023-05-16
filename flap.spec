@@ -5,7 +5,7 @@ datas = [('assets', 'assets')]
 block_cipher = None
 
 a = Analysis(
-    ['flap.py'],
+    ['main.py'],
     pathex=[],
     binaries=[],
     datas=datas,
