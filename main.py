@@ -3,7 +3,7 @@ from random import randrange
 import Settings
 from SpriteHandler import SpriteHandler
 import pygame as pg
-import pygame.freetype as ft
+# import pygame.freetype as ft
 import sys
 from pygame._sdl2.video import Window, Renderer, Texture     
 
@@ -11,6 +11,7 @@ from pygame._sdl2.video import Window, Renderer, Texture
 class App:
     def __init__(self):
         pg.init()
+        pg.mixer.init()
         screen_info = pg.display.Info()
         self.window = Window(title='flap.py', size=(screen_info.current_w,screen_info.current_h))
         self.window.set_icon(pg.image.load(Settings.ASSETS_DIR_PATH +'/favicon.ico'))
@@ -19,7 +20,8 @@ class App:
         self.renderer.scale = (self.sprite_handler.scale, self.sprite_handler.scale)
         self.clock = pg.time.Clock()
         self.dt = 0.0
-        self.font = ft.SysFont('Verdana', Settings.FONT_SIZE)
+        self.font = pg.font.SysFont('Verdana', Settings.FONT_SIZE)
+        # self.font = ft.SysFont('Verdana', Settings.FONT_SIZE)
         self.fps_size = [Settings.FONT_SIZE * 13, Settings.FONT_SIZE]
         pg.time.set_timer(Settings.EVENT_DAY_NIGHT, Settings.DAY_NIGHT_TIME_MS)
         self.speed = Settings.SPEED
@@ -32,8 +34,10 @@ class App:
 
     def draw_fps(self):
         fps = f'{self.clock.get_fps() :.0f} FPS | {self.sprite_handler.count_sprites()} SPRITES'
-        surf_black, rect = self.font.render(text=fps, fgcolor='black')
-        surf, rect = self.font.render(text=fps, fgcolor='green')
+        # surf_black, rect = self.font.render(text=fps, fgcolor='black')
+        # surf_black, rect = self.font.render(text=fps, fgcolor='green')
+        surf_black = self.font.render(fps, False, 'black')
+        surf = self.font.render(fps, False, 'green')
         tex1 = Texture.from_surface(self.renderer, surf_black)
         tex2 = Texture.from_surface(self.renderer, surf)
         tex1.draw(tex1.get_rect(),(2,0,tex1.width, tex1.height))
@@ -75,6 +79,7 @@ class App:
             self.update()
             self.draw()
         self.sprite_handler.quit()
+        pg.mixer.quit()
         pg.quit()
 
 if __name__ == '__main__':
