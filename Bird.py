@@ -8,9 +8,11 @@ class Bird(SpriteUnit):
         self.image_down = Image(Texture.from_surface(self.handler.renderer, image_down))
         self.image_middle = Image(Texture.from_surface(self.handler.renderer, image_middle))
         self.image_up = Image(Texture.from_surface(self.handler.renderer, image_up))
-        self.image = image_middle
-        self.angle = 0
-        self.mass = 0.1
+        self.image = self.image_middle
+        self.floor = self.handler.base.y - self.handler.base.rect.h//2 - self.image.get_rect().h//2
+        self.mass = 0.0
+        self.dead = False
+        self.hit = False
 
     def translate(self):
         self.vel_y = self.vel_y  + 9.81*1000*self.mass*self.handler.app.dt
@@ -24,18 +26,43 @@ class Bird(SpriteUnit):
             self.update_image(self.image_down)
         else : 
             self.update_image(self.image_middle)
+        if self.vel_y > 0 and self.image.angle < 45 or self.vel_y < 0 and self.image.angle > -45:
+            self.rotate()
 
     def rotate(self):
-        self.image.angle += self.vel_y * self.handler.app.dt
+        self.image.angle += float(self.vel_y) * self.handler.app.dt
 
     def bump(self, speed):
+        if self.hit:
+            return
+        self.mass = Settings.BIRD_MASS_KG
         self.vel_y = -speed
         self.handler.sounds['wing'].play()
 
     def update(self):
         self.translate() 
-        if  self.y > Settings.WIN_H - self.handler.base.image.get_rect().height or pg.sprite.spritecollideany(self, self.handler.group_collide, pg.sprite.collide_mask):
+        if self.dead:
+            return
+        if not self.hit and pg.sprite.spritecollideany(self, self.handler.group_collide, pg.sprite.collide_mask):
+            self.hit = True
+            self.vel_x = 0
+            self.handler.update_speed(0)
             self.handler.sounds['hit'].play()
             self.handler.sounds['die'].play()
+
+        if  self.y > self.floor:
+            if not self.dead:
+                self.handler.sounds['hit'].play()
+            self.hit = True
+            self.dead= True
+            self.vel_x = 0
+            self.vel_y = 0
+            self.mass = 0.0
             self.handler.game_over()
+
+    def reset(self):
+        super().reset()
+        self.dead=False
+        self.hit=False
+        self.mass = 0.0
             

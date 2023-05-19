@@ -24,7 +24,15 @@ class SpriteUnit(pg.sprite.Sprite):
     def update(self):
         self.translate()
 
-    def update_image(self, image):
+    def update_image(self, image : Image):
+        angle = self.image.angle
         self.image = image
+        self.image.angle =  angle
         self.rect = self.image.get_rect()
         self.rect.center = self.x, self.y
+
+    def reset(self):
+        self.x = self.orig_x
+        self.y = self.orig_y 
+        self.vel_x = 0
+        self.vel_y = 0

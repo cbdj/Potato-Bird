@@ -29,7 +29,7 @@ exe = EXE(
     a.zipfiles,
     a.datas,
     [],
-    name='flappy',
+    name='flap.py',
     icon='assets/favicon.ico',
     debug=False,
     bootloader_ignore_signals=False,

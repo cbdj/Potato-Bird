@@ -39,3 +39,4 @@ SPEED = 100 # initial pipe and base speed
 SPEED_INCREASE_FACTOR = 1.3 # speed increase at each day/night event
 DAY_NIGHT_TIME_MS = 10000
 EVENT_DAY_NIGHT = pg.USEREVENT+1
+BIRD_MASS_KG = 0.1

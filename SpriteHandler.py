@@ -42,7 +42,7 @@ class SpriteHandler:
         self.base=Base(self, self.images['base'], Settings.WIN_W, Settings.WIN_H-self.images['base'].get_height()//2)
 
         # Creating Bird sprite
-        self.bird = Bird(self, self.images['yellowbird-downflap'], self.images['yellowbird-midflap'], self.images['yellowbird-upflap'], Settings.WIN_W // 2, Settings.WIN_H // 2)
+        self.bird = Bird(self, self.images['bird_downflap'], self.images['bird_midflap'], self.images['bird_upflap'], Settings.WIN_W // 2, Settings.WIN_H // 2)
 
         # Creating menu
         self.menu = SpriteUnit(self,self.images['message'], Settings.WIN_W // 2, Settings.WIN_H // 2)
@@ -70,14 +70,13 @@ class SpriteHandler:
         self.background.reset()
         self.score.reset()
         self.score.display_best()
-        self.bird.x = self.bird.orig_x
-        self.bird.y = self.bird.orig_y 
+        self.bird.reset()
         for pipe, pipe_reversed in self.pipes:
-            pipe.x = pipe_reversed.x = pipe.orig_x
-            pipe.point_given = True
+            pipe.reset()
+            pipe_reversed.reset()
         self.group_foreground.empty()
         self.group_foreground.add(self.menu, self.score)
-        self.update_speed(Settings.SPEED)
+        self.update_speed(0)
         self.app.dt=0.0
         self.group_background.update()
         self.group_collide.update()
@@ -142,7 +141,7 @@ class SpriteHandler:
         self.pipe_reque_time += self.app.dt
         if self.pipe_reque_time > self.pipe_requeue_interval:
             for (pipe1,pipe2) in self.pipes:
-                if pipe1.x < -pipe1.rect.width :
+                if pipe1.vel_x != 0 and pipe1.x < -pipe1.rect.width :
                     # requeue one Pipe that is out of screen
                     self.pipe_reque_time = 0.0
                     self.pipe_requeue_interval = self.rand_pipe_requeue_interval(-pipe1.vel_x)
@@ -160,10 +159,10 @@ class SpriteHandler:
 
 
     def update(self):
-        if self._paused:
-            return
-        if not self._started:
-            return
+        # if self._paused:
+        #     return
+        # if not self._started:
+        #     return
         self.update_score()
         self.maybe_requeue_pipes()
                 
@@ -195,10 +194,12 @@ class SpriteHandler:
     def on_action(self):
         if self._paused:
             self._paused = False
-            self.reset()
         elif not self._started:
-            self.start()
-            self.bird.bump(Settings.BUMP_SPEED)
+            if self.bird.dead:
+                self.reset()
+            else:
+                self.start()
+                self.bird.bump(Settings.BUMP_SPEED)
         else:
             self.bird.bump(Settings.BUMP_SPEED)
 
@@ -217,8 +218,7 @@ class SpriteHandler:
     def game_over(self):
         self.group_foreground.add(self._gameover)
         self.score.save_best()
-        self.update_speed(0)
-        self._paused = True
+        self.stop()
 
     def quit(self):
         self.score.save_best()

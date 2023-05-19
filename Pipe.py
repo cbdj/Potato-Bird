@@ -10,3 +10,6 @@ class Pipe(SpriteUnit):
         self.x += self.vel_x * self.handler.app.dt
         self.rect.center = self.x, self.y
         
+    def reset(self):
+        super().reset()
+        self.point_given = True

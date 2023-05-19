@@ -1,5 +1,6 @@
 
 import pygame as pg
+import os
 from pygame._sdl2 import Image, Texture
 from SpriteUnit import SpriteUnit
 
@@ -8,10 +9,19 @@ class Score(SpriteUnit):
         self.images=images
         self.best=0
         self.score=0
+        path = '.'
+        try :
+            path = pg.system.get_pref_path()
+        except Exception as e:
+            print(e)
+            pass
+        self.score_path = os.path.join(path, 'score.txt')
+        print(f'score file path : {self.score_path}')
         try:
-            with open('score.txt','r') as score_file:
+            with open(self.score_path,'r') as score_file:
                 self.best=int(score_file.read())
-        except Exception:
+        except Exception as e:
+            print(e)
             pass
         super().__init__(handler, self.get_score_surface(self.best),x,y)
 
@@ -20,6 +30,7 @@ class Score(SpriteUnit):
         self.update_image(Image(Texture.from_surface(self.handler.renderer, self.get_score_surface(self.best))))
 
     def reset(self):
+        super().reset()
         self.score=0
         self.update_image(Image(Texture.from_surface(self.handler.renderer, self.get_score_surface(self.score))))
 
@@ -30,7 +41,7 @@ class Score(SpriteUnit):
         self.update_image(Image(Texture.from_surface(self.handler.renderer, self.get_score_surface(self.score))))
     
     def save_best(self):
-            with open('score.txt','w') as score_file:
+            with open(self.score_path,'w') as score_file:
                 score_file.write(str(self.best))
 
     def get_score_surface(self, score):
