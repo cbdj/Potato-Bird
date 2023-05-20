@@ -1,13 +1,13 @@
 [app]
 
 # (str) Title of your application
-title = Flappy
+title = Flap.py
 
 # (str) Package name
 package.name = flappy
 
 # (str) Package domain (needed for android/ios packaging)
-package.domain = org.test
+package.domain = org.cbdj
 
 # (str) Source code where the main.py live
 source.dir = .
@@ -29,25 +29,25 @@ source.exclude_dirs = tests, bin, venv, dist, build
 #source.exclude_patterns = license,images/*/*.jpg
 
 # (str) Application versioning (method 1)
-version = 0.1
+# version = 0.1
 
 # (str) Application versioning (method 2)
-# version.regex = __version__ = ['"](.*)['"]
-# version.filename = %(source.dir)s/main.py
+version.regex = __version__ = ['"](.*)['"]
+version.filename = %(source.dir)s/main.py
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3,pygame-ce,jnius,sdl2,sdl2_image,sdl2_mixer,sdl2_ttf,png,jpeg
+requirements = python3,pygame-ce
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
 # requirements.source.kivy = ../../kivy
 
 # (str) Presplash of the application
-#presplash.filename = %(source.dir)s/data/presplash.png
+presplash.filename = %(source.dir)s/assets/upscaled_favicon.png
 
 # (str) Icon of the application
-#icon.filename = %(source.dir)s/data/icon.png
+icon.filename = %(source.dir)s/assets/upscaled_favicon.png
 
 # (list) Supported orientations
 # Valid options are: landscape, portrait, portrait-reverse or landscape-reverse

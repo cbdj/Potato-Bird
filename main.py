@@ -7,6 +7,7 @@ import pygame as pg
 import sys
 from pygame._sdl2.video import Window, Renderer, Texture     
 
+__version__ = "1.0.0"
 
 class App:
     def __init__(self):

@@ -14,7 +14,7 @@ def get_platform():
         return 'win'
 platform = get_platform()
 if platform=="android":
-    base_path=os.path.abspath("/data/data/org.test.flappy/files/app/")
+    base_path=os.path.abspath("/data/data/org.cbdj.flappy/files/app/")
 elif platform=="win":
     try:
     # PyInstaller creates a temp folder and stores path in _MEIPASS
