@@ -123,7 +123,8 @@ class SpriteHandler:
         if not Settings.USE_OFFICIAL_ASSETS :
             font = pg.font.SysFont(None, 3*Settings.FONT_SIZE)
             for i in range(10):
-                images[str(i)] = pg.transform.scale_by(images[str(i)],font.get_height()/images[str(i)].get_height())
+                factor=font.get_height()/images[str(i)].get_height()
+                images[str(i)] = pg.transform.scale(images[str(i)],(factor*images[str(i)].get_width(), factor*images[str(i)].get_height()))
             # images['gameover'] = font.render("GAME OVER", False, 'orange')
             images['gameover'] = Exfont.text_speech(font, 'GAME OVER', 'orange', True, 3, 'white')
             flap_py = Exfont.text_speech(font, 'FLAP.PY', 'white', True, 3, 'black')
