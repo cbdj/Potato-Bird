@@ -156,7 +156,8 @@ class SpriteHandler:
 
     def load_sounds(self):
         """ from .ogg to pygame Sound """
-        sounds = dict([(path.stem, pg.mixer.Sound(str(path))) for path in pathlib.Path(Settings.AUDIO_DIR_PATH).rglob('*.ogg') if path.is_file()])
+        exts=['.ogg','.mp3']
+        sounds = dict([(path.stem, pg.mixer.Sound(str(path))) for path in pathlib.Path(Settings.AUDIO_DIR_PATH).rglob('*.*') if path.is_file() and path.suffix in exts])
         return sounds
 
 

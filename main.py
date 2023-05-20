@@ -4,7 +4,8 @@ from SpriteHandler import SpriteHandler
 import pygame as pg
 # import pygame.freetype as ft
 import sys
-from pygame._sdl2.video import Window, Renderer, Texture     
+from pygame._sdl2.video import Window, Renderer, Texture
+import os     
 
 __version__ = "1.0.0"
 
@@ -14,7 +15,7 @@ class App:
         pg.mixer.init()
         screen_info = pg.display.Info()
         self.window = Window(title='flap.py', size=(screen_info.current_w,screen_info.current_h))
-        self.window.set_icon(pg.image.load(Settings.ASSETS_DIR_PATH +'/favicon.ico'))
+        self.window.set_icon(pg.image.load(os.path.join(Settings.ASSETS_DIR_PATH,'favicon.png')))
         self.renderer = Renderer(self.window)
         self.sprite_handler = SpriteHandler(self)
         self.renderer.scale = (self.sprite_handler.scale, self.sprite_handler.scale)
