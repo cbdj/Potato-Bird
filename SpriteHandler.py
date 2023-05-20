@@ -1,4 +1,5 @@
 import Settings
+import numpy as np
 from Background import Background
 from Base import Base
 from Pipe import Pipe
@@ -9,7 +10,7 @@ from pygame._sdl2.video import Image, Texture
 import pathlib
 from random import randrange, uniform
 from SpriteUnit import SpriteUnit
-import time
+import Exfont
 
 class SpriteHandler:
     def __init__(self, app):
@@ -42,12 +43,12 @@ class SpriteHandler:
         self.base=Base(self, self.images['base'], Settings.WIN_W, Settings.WIN_H-self.images['base'].get_height()//2)
 
         # Creating Bird sprite
-        self.bird = Bird(self, self.images['yellowbird-downflap'], self.images['yellowbird-midflap'], self.images['yellowbird-upflap'], Settings.WIN_W // 2, Settings.WIN_H // 2)
+        self.bird = Bird(self, self.images[Settings.BIRD_COLOR + 'bird-downflap'], self.images[Settings.BIRD_COLOR + 'bird-midflap'], self.images[Settings.BIRD_COLOR + 'bird-upflap'], Settings.WIN_W // 2, Settings.WIN_H // 2)
 
         # Creating menu
         self.menu = SpriteUnit(self,self.images['message'], Settings.WIN_W // 2, Settings.WIN_H // 2)
         self._gameover = SpriteUnit(self,self.images['gameover'], Settings.WIN_W // 2, Settings.WIN_H // 2)
-        self.score=Score(self,self.images, Settings.WIN_W // 2, Settings.WIN_H //6)
+        self.score=Score(self,self.images, Settings.WIN_W // 4, Settings.WIN_H //6)
 
         # Creating groups
         self.group_background = pg.sprite.GroupSingle(self.background)
@@ -70,14 +71,13 @@ class SpriteHandler:
         self.background.reset()
         self.score.reset()
         self.score.display_best()
-        self.bird.x = self.bird.orig_x
-        self.bird.y = self.bird.orig_y 
+        self.bird.reset()
         for pipe, pipe_reversed in self.pipes:
-            pipe.x = pipe_reversed.x = pipe.orig_x
-            pipe.point_given = True
+            pipe.reset()
+            pipe_reversed.reset()
         self.group_foreground.empty()
         self.group_foreground.add(self.menu, self.score)
-        self.update_speed(Settings.SPEED)
+        self.update_speed(0)
         self.app.dt=0.0
         self.group_background.update()
         self.group_collide.update()
@@ -103,11 +103,42 @@ class SpriteHandler:
         w = self.images['background-day'].get_width()
         h = self.images['background-day'].get_height() + self.images['base'].get_height()
         return w,h
-
+    
+    def greyscale(self,surface: pg.Surface):
+        arr = pg.surfarray.pixels3d(surface)
+        mean_arr = np.dot(arr[:,:,:], [0.216, 0.587, 0.144])
+        mean_arr3d = mean_arr[..., np.newaxis]
+        new_arr = np.repeat(mean_arr3d[:, :, :], 3, axis=2)
+        ret = pg.surfarray.make_surface(new_arr)
+        ret.set_colorkey((0, 0, 0))
+        return ret
+    
     def load_images(self):
         """ from .png to pygame Surfaces """
+        # loading .png images
         images = dict([(path.stem, pg.image.load(str(path))) for path in pathlib.Path(Settings.SPRITE_DIR_PATH).rglob('*.png') if path.is_file()])
+        # reversing pipes
         images.update(dict([(f'reversed-{path.stem}', pg.transform.flip(pg.image.load(str(path)), False, True)) for path in pathlib.Path(Settings.SPRITE_DIR_PATH).rglob('*.png') if path.is_file() and 'pipe' in str(path)]))
+        #
+        if not Settings.USE_OFFICIAL_ASSETS :
+            font = pg.font.SysFont(None, 3*Settings.FONT_SIZE)
+            for i in range(10):
+                images[str(i)] = pg.transform.scale_by(images[str(i)],font.get_height()/images[str(i)].get_height())
+            # images['gameover'] = font.render("GAME OVER", False, 'orange')
+            images['gameover'] = Exfont.text_speech(font, 'GAME OVER', 'orange', True, 3, 'white')
+            flap_py = Exfont.text_speech(font, 'FLAP.PY', 'white', True, 3, 'black')
+            get_ready = Exfont.text_speech(font, 'GET READY!', 'green', True, 3, 'black')
+            grey_bird = self.greyscale(images[Settings.BIRD_COLOR + 'bird-midflap'])
+            images['message'] = pg.Surface((images['background-day'].get_width(),images['background-day'].get_height()), pg.SRCALPHA)
+            index_w = images['message'].get_width()//2-grey_bird.get_width()//2
+            index_h = images['message'].get_height()//2 - grey_bird.get_height()//2
+            images['message'].blit(grey_bird, (index_w, index_h))
+            index_w = images['message'].get_width()//2-get_ready.get_width()//2
+            index_h -= 2*get_ready.get_height()
+            images['message'].blit(get_ready, (index_w, index_h))
+            index_w = images['message'].get_width()//2-flap_py.get_width()//2
+            index_h -= 2*flap_py.get_height()
+            images['message'].blit(flap_py, (index_w, index_h))
         return images
     
     def extend_world(self, new_width):
@@ -142,7 +173,7 @@ class SpriteHandler:
         self.pipe_reque_time += self.app.dt
         if self.pipe_reque_time > self.pipe_requeue_interval:
             for (pipe1,pipe2) in self.pipes:
-                if pipe1.x < -pipe1.rect.width :
+                if pipe1.vel_x != 0 and pipe1.x < -pipe1.rect.width :
                     # requeue one Pipe that is out of screen
                     self.pipe_reque_time = 0.0
                     self.pipe_requeue_interval = self.rand_pipe_requeue_interval(-pipe1.vel_x)
@@ -160,10 +191,10 @@ class SpriteHandler:
 
 
     def update(self):
-        if self._paused:
-            return
-        if not self._started:
-            return
+        # if self._paused:
+        #     return
+        # if not self._started:
+        #     return
         self.update_score()
         self.maybe_requeue_pipes()
                 
@@ -195,10 +226,12 @@ class SpriteHandler:
     def on_action(self):
         if self._paused:
             self._paused = False
-            self.reset()
         elif not self._started:
-            self.start()
-            self.bird.bump(Settings.BUMP_SPEED)
+            if self.bird.dead:
+                self.reset()
+            else:
+                self.start()
+                self.bird.bump(Settings.BUMP_SPEED)
         else:
             self.bird.bump(Settings.BUMP_SPEED)
 
@@ -217,8 +250,7 @@ class SpriteHandler:
     def game_over(self):
         self.group_foreground.add(self._gameover)
         self.score.save_best()
-        self.update_speed(0)
-        self._paused = True
+        self.stop()
 
     def quit(self):
         self.score.save_best()
