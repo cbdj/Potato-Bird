@@ -1,4 +1,5 @@
 import Settings
+import numpy as np
 from Background import Background
 from Base import Base
 from Pipe import Pipe
@@ -9,7 +10,7 @@ from pygame._sdl2.video import Image, Texture
 import pathlib
 from random import randrange, uniform
 from SpriteUnit import SpriteUnit
-import time
+import Exfont
 
 class SpriteHandler:
     def __init__(self, app):
@@ -42,12 +43,12 @@ class SpriteHandler:
         self.base=Base(self, self.images['base'], Settings.WIN_W, Settings.WIN_H-self.images['base'].get_height()//2)
 
         # Creating Bird sprite
-        self.bird = Bird(self, self.images['bird_downflap'], self.images['bird_midflap'], self.images['bird_upflap'], Settings.WIN_W // 2, Settings.WIN_H // 2)
+        self.bird = Bird(self, self.images[Settings.BIRD_COLOR + 'bird-downflap'], self.images[Settings.BIRD_COLOR + 'bird-midflap'], self.images[Settings.BIRD_COLOR + 'bird-upflap'], Settings.WIN_W // 2, Settings.WIN_H // 2)
 
         # Creating menu
         self.menu = SpriteUnit(self,self.images['message'], Settings.WIN_W // 2, Settings.WIN_H // 2)
         self._gameover = SpriteUnit(self,self.images['gameover'], Settings.WIN_W // 2, Settings.WIN_H // 2)
-        self.score=Score(self,self.images, Settings.WIN_W // 2, Settings.WIN_H //6)
+        self.score=Score(self,self.images, Settings.WIN_W // 4, Settings.WIN_H //6)
 
         # Creating groups
         self.group_background = pg.sprite.GroupSingle(self.background)
@@ -102,11 +103,42 @@ class SpriteHandler:
         w = self.images['background-day'].get_width()
         h = self.images['background-day'].get_height() + self.images['base'].get_height()
         return w,h
-
+    
+    def greyscale(self,surface: pg.Surface):
+        arr = pg.surfarray.pixels3d(surface)
+        mean_arr = np.dot(arr[:,:,:], [0.216, 0.587, 0.144])
+        mean_arr3d = mean_arr[..., np.newaxis]
+        new_arr = np.repeat(mean_arr3d[:, :, :], 3, axis=2)
+        ret = pg.surfarray.make_surface(new_arr)
+        ret.set_colorkey((0, 0, 0))
+        return ret
+    
     def load_images(self):
         """ from .png to pygame Surfaces """
+        # loading .png images
         images = dict([(path.stem, pg.image.load(str(path))) for path in pathlib.Path(Settings.SPRITE_DIR_PATH).rglob('*.png') if path.is_file()])
+        # reversing pipes
         images.update(dict([(f'reversed-{path.stem}', pg.transform.flip(pg.image.load(str(path)), False, True)) for path in pathlib.Path(Settings.SPRITE_DIR_PATH).rglob('*.png') if path.is_file() and 'pipe' in str(path)]))
+        #
+        if not Settings.USE_OFFICIAL_ASSETS :
+            font = pg.font.SysFont(None, 3*Settings.FONT_SIZE)
+            for i in range(10):
+                images[str(i)] = pg.transform.scale_by(images[str(i)],font.get_height()/images[str(i)].get_height())
+            # images['gameover'] = font.render("GAME OVER", False, 'orange')
+            images['gameover'] = Exfont.text_speech(font, 'GAME OVER', 'orange', True, 3, 'white')
+            flap_py = Exfont.text_speech(font, 'FLAP.PY', 'white', True, 3, 'black')
+            get_ready = Exfont.text_speech(font, 'GET READY!', 'green', True, 3, 'black')
+            grey_bird = self.greyscale(images[Settings.BIRD_COLOR + 'bird-midflap'])
+            images['message'] = pg.Surface((images['background-day'].get_width(),images['background-day'].get_height()), pg.SRCALPHA)
+            index_w = images['message'].get_width()//2-grey_bird.get_width()//2
+            index_h = images['message'].get_height()//2 - grey_bird.get_height()//2
+            images['message'].blit(grey_bird, (index_w, index_h))
+            index_w = images['message'].get_width()//2-get_ready.get_width()//2
+            index_h -= 2*get_ready.get_height()
+            images['message'].blit(get_ready, (index_w, index_h))
+            index_w = images['message'].get_width()//2-flap_py.get_width()//2
+            index_h -= 2*flap_py.get_height()
+            images['message'].blit(flap_py, (index_w, index_h))
         return images
     
     def extend_world(self, new_width):

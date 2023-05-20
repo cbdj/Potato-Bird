@@ -1,5 +1,4 @@
 import pathlib
-from random import randrange
 import Settings
 from SpriteHandler import SpriteHandler
 import pygame as pg

@@ -36,3 +36,4 @@ class SpriteUnit(pg.sprite.Sprite):
         self.y = self.orig_y 
         self.vel_x = 0
         self.vel_y = 0
+        self.image.angle=0

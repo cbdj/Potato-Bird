@@ -29,9 +29,14 @@ WIN_W = 0
 WIN_H = 0
 
 # CONSTANTS
-ASSETS_DIR_PATH = base_path + '/assets'
+USE_OFFICIAL_ASSETS = False
+if USE_OFFICIAL_ASSETS : 
+    ASSETS_DIR_PATH = base_path + '/official_assets'
+else:
+    ASSETS_DIR_PATH = base_path + '/assets'
 SPRITE_DIR_PATH = ASSETS_DIR_PATH + '/sprites'
 AUDIO_DIR_PATH = ASSETS_DIR_PATH + '/audio'
+BIRD_COLOR = 'yellow'
 PIPE_DENSITY = 6
 BUMP_SPEED = 300
 FONT_SIZE = 20
