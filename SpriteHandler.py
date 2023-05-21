@@ -48,7 +48,7 @@ class SpriteHandler:
         # Creating menu
         self.menu = SpriteUnit(self,self.images['message'], Settings.WIN_W // 2, Settings.WIN_H // 2)
         self._gameover = SpriteUnit(self,self.images['gameover'], Settings.WIN_W // 2, Settings.WIN_H // 2)
-        self.score=Score(self,self.images, Settings.WIN_W // 4, Settings.WIN_H //6)
+        self.score=Score(self,self.images, Settings.WIN_W // 2, 3*Settings.FONT_SIZE)
 
         # Creating groups
         self.group_background = pg.sprite.GroupSingle(self.background)
@@ -121,7 +121,7 @@ class SpriteHandler:
         images.update(dict([(f'reversed-{path.stem}', pg.transform.flip(pg.image.load(str(path)), False, True)) for path in pathlib.Path(Settings.SPRITE_DIR_PATH).rglob('*.png') if path.is_file() and 'pipe' in str(path)]))
         #
         if not Settings.USE_OFFICIAL_ASSETS :
-            font = pg.font.SysFont(None, 3*Settings.FONT_SIZE)
+            font = pg.font.SysFont(None, 2*Settings.FONT_SIZE)
             for i in range(10):
                 factor=font.get_height()/images[str(i)].get_height()
                 images[str(i)] = pg.transform.scale(images[str(i)],(factor*images[str(i)].get_width(), factor*images[str(i)].get_height()))

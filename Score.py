@@ -47,8 +47,8 @@ class Score(SpriteUnit):
                 score_file.write(str(self.best))
 
     def get_score_surface(self, score : int):
-        prefix_best = Exfont.text_speech(pg.font.SysFont(None, 3*Settings.FONT_SIZE), 'Best : ', 'white', True, 3, 'black')
-        prefix_score = Exfont.text_speech(pg.font.SysFont(None, 3*Settings.FONT_SIZE), 'Score : ', 'white', True, 3, 'black')
+        prefix_best = Exfont.text_speech(pg.font.SysFont(None, 2*Settings.FONT_SIZE), 'Best : ', 'white', True, 3, 'black')
+        prefix_score = Exfont.text_speech(pg.font.SysFont(None, 2*Settings.FONT_SIZE), 'Score : ', 'white', True, 3, 'black')
         prefix_width = max(prefix_best.get_width(),prefix_score.get_width())
         score_width = prefix_width
         score_height = prefix_best.get_height() + prefix_score.get_height()

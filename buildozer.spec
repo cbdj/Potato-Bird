@@ -13,16 +13,16 @@ package.domain = org.cbdj
 source.dir = .
 
 # (list) Source files to include (let empty to include all the files)
-source.include_exts = py,png,jpg,kv,atlas,ogg,wav,ico
+source.include_exts = py,png,jpg,kv,atlas,mp3,wav,ogg
 
 # (list) List of inclusions using pattern matching
-source.include_patterns = assets/*,images/*.png,assets/audio/*,assets/sprites/*
+source.include_patterns = assets/*,assets/audio/*,assets/sprites/*
 
 # (list) Source files to exclude (let empty to not exclude anything)
 #source.exclude_exts = spec
 
 # (list) List of directory to exclude (let empty to not exclude anything)
-source.exclude_dirs = tests, bin, venv, dist, build
+#source.exclude_dirs = tests, bin, venv
 
 # (list) List of exclusions using pattern matching
 # Do not prefix with './'
@@ -37,17 +37,17 @@ version.filename = %(source.dir)s/main.py
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3,pygame-ce
+requirements = python3,pygame,jnius,sdl2,sdl2_image,sdl2_mixer,sdl2_ttf,png,jpeg,numpy
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
 # requirements.source.kivy = ../../kivy
 
 # (str) Presplash of the application
-presplash.filename = %(source.dir)s/assets/upscaled_favicon.png
+presplash.filename = %(source.dir)s/assets/favicon.png
 
 # (str) Icon of the application
-icon.filename = %(source.dir)s/assets/upscaled_favicon.png
+icon.filename = %(source.dir)s/assets/favicon.png
 
 # (list) Supported orientations
 # Valid options are: landscape, portrait, portrait-reverse or landscape-reverse
