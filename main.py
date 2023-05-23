@@ -1,11 +1,12 @@
-import pathlib
+import sys
+import os     
+sys.path.append(os.path.abspath(__file__))
 import Settings
 from SpriteHandler import SpriteHandler
 import pygame as pg
 # import pygame.freetype as ft
-import sys
-from pygame._sdl2.video import Window, Renderer, Texture
-import os     
+from pygame._sdl2.video import Window, Renderer, Texture, Image
+import Exfont
 
 __version__ = "1.0.0"
 
@@ -21,9 +22,8 @@ class App:
         self.renderer.scale = (self.sprite_handler.scale, self.sprite_handler.scale)
         self.clock = pg.time.Clock()
         self.dt = 0.0
-        self.font = pg.font.SysFont('Verdana', Settings.FONT_SIZE)
-        # self.font = ft.SysFont('Verdana', Settings.FONT_SIZE)
-        self.fps_size = [Settings.FONT_SIZE * 13, Settings.FONT_SIZE]
+        self.font = pg.font.SysFont('Verdana', Settings.FONT_SIZE//2)
+        self.fps_size = (Settings.FONT_SIZE * 13, Settings.FONT_SIZE//2)
         pg.time.set_timer(Settings.EVENT_DAY_NIGHT, Settings.DAY_NIGHT_TIME_MS)
         self.speed = Settings.SPEED
         self.running = True
@@ -31,21 +31,12 @@ class App:
 
     def update(self):
         self.sprite_handler.update()
-        self.dt = self.clock.tick(60) * 0.001
+        self.dt = self.clock.tick(165) * 0.001
 
     def draw_fps(self):
-        fps = f'{self.clock.get_fps() :.0f} FPS | {self.sprite_handler.count_sprites()} SPRITES'
-        # surf_black, rect = self.font.render(text=fps, fgcolor='black')
-        # surf_black, rect = self.font.render(text=fps, fgcolor='green')
-        surf_black = self.font.render(fps, False, 'black')
-        surf = self.font.render(fps, False, 'green')
-        tex1 = Texture.from_surface(self.renderer, surf_black)
-        tex2 = Texture.from_surface(self.renderer, surf)
-        tex1.draw(tex1.get_rect(),(2,0,tex1.width, tex1.height))
-        tex1.draw(tex1.get_rect(),(0,2,tex1.width, tex1.height))
-        tex1.draw(tex1.get_rect(),(-2,0,tex1.width, tex1.height))
-        tex1.draw(tex1.get_rect(),(0,-2,tex1.width, tex1.height))
-        tex2.draw(tex1.get_rect(),(0,0,tex1.width, tex1.height))
+        img = Image(Texture.from_surface(self.renderer, Exfont.text_speech(self.font, f'{self.clock.get_fps() :.0f} FPS | {self.sprite_handler.count_sprites()} SPRITES','green', True, 1, 'black')))
+        img.draw(img.get_rect(),img.get_rect())
+        
 
     def draw(self):
         self.renderer.clear()

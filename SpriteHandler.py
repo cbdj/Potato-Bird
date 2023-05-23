@@ -11,6 +11,7 @@ import pathlib
 from random import randrange, uniform
 from SpriteUnit import SpriteUnit
 import Exfont
+import pygame.gfxdraw as gfx
 
 class SpriteHandler:
     def __init__(self, app):
@@ -93,6 +94,7 @@ class SpriteHandler:
     
     def update_speed(self, speed):
         self.base.vel_x = -speed
+        self.bird.vel_x = -speed
         for (pipe, pipe_reversed) in self.pipes :
             pipe.vel_x = -speed
             pipe_reversed.vel_x = -speed
@@ -121,18 +123,18 @@ class SpriteHandler:
         images.update(dict([(f'reversed-{path.stem}', pg.transform.flip(pg.image.load(str(path)), False, True)) for path in pathlib.Path(Settings.SPRITE_DIR_PATH).rglob('*.png') if path.is_file() and 'pipe' in str(path)]))
         #
         if not Settings.USE_OFFICIAL_ASSETS :
-            font = pg.font.SysFont(None, 2*Settings.FONT_SIZE)
-            for i in range(10):
-                factor=font.get_height()/images[str(i)].get_height()
-                images[str(i)] = pg.transform.scale(images[str(i)],(factor*images[str(i)].get_width(), factor*images[str(i)].get_height()))
-            # images['gameover'] = font.render("GAME OVER", False, 'orange')
-            images['gameover'] = Exfont.text_speech(font, 'GAME OVER', 'orange', True, 3, 'white')
-            flap_py = Exfont.text_speech(font, 'FLAP.PY', 'white', True, 3, 'black')
-            get_ready = Exfont.text_speech(font, 'GET READY!', 'green', True, 3, 'black')
+            font = pg.font.SysFont(None, Settings.FONT_SIZE)
+            half_font = pg.font.SysFont(None, Settings.FONT_SIZE//2)
+            # create 'gameover' asset
+            images['gameover'] = Exfont.text_speech(font, 'GAME OVER', 'orange', True, 2, 'white')
+            # create 'message' asset
+            flap_py = Exfont.text_speech(font, 'FLAP.PY', 'white', True, 2, 'black')
+            get_ready = Exfont.text_speech(font, 'GET READY!', 'green', True, 2, 'black')
             grey_bird = self.greyscale(images[Settings.BIRD_COLOR + 'bird-midflap'])
+            tap = Exfont.text_speech(half_font, 'TAP!', 'white', True, 1, 'black')
             images['message'] = pg.Surface((images['background-day'].get_width(),images['background-day'].get_height()), pg.SRCALPHA)
-            index_w = images['message'].get_width()//2-grey_bird.get_width()//2
-            index_h = images['message'].get_height()//2 - grey_bird.get_height()//2
+            index_w = index_w_bird = images['message'].get_width()//2-grey_bird.get_width()//2
+            index_h = index_h_bird = images['message'].get_height()//2 - grey_bird.get_height()//2
             images['message'].blit(grey_bird, (index_w, index_h))
             index_w = images['message'].get_width()//2-get_ready.get_width()//2
             index_h -= 2*get_ready.get_height()
@@ -140,6 +142,12 @@ class SpriteHandler:
             index_w = images['message'].get_width()//2-flap_py.get_width()//2
             index_h -= 2*flap_py.get_height()
             images['message'].blit(flap_py, (index_w, index_h))
+            gfx.box(images['message'], (index_w_bird - 2*grey_bird.get_width(), index_h_bird, grey_bird.get_width(), grey_bird.get_height()), (255,0,0))
+            gfx.box(images['message'], (index_w_bird + 2*grey_bird.get_width(), index_h_bird, grey_bird.get_width(), grey_bird.get_height()), (255,0,0))
+            gfx.filled_trigon(images['message'],index_w_bird - grey_bird.get_width(), index_h_bird, index_w_bird, index_h_bird + grey_bird.get_height()//2,index_w_bird - grey_bird.get_width(), index_h_bird +2*grey_bird.get_height()//2, (255,0,0))
+            gfx.filled_trigon(images['message'],index_w_bird + 2*grey_bird.get_width(), index_h_bird, index_w_bird + grey_bird.get_width(), index_h_bird + grey_bird.get_height()//2,index_w_bird + 2*grey_bird.get_width(), index_h_bird +2*grey_bird.get_height()//2, (255,0,0))
+            images['message'].blit(tap, (index_w_bird - 3*grey_bird.get_width()/2, index_h_bird+grey_bird.get_height()/4))
+            images['message'].blit(tap, (index_w_bird + 3*grey_bird.get_width()/2, index_h_bird+grey_bird.get_height()/4))
         return images
     
     def extend_world(self, new_width):
@@ -168,8 +176,8 @@ class SpriteHandler:
             Reque pipes 
             Used when pipes are out of camera range
             """
-            pipe.y = pipe.orig_y - randrange(pipe.rect.height//2, 2*pipe.rect.height//3)
-            pipe_reversed.y = pipe_reversed.orig_y + randrange(pipe.rect.height//2, 3*pipe.rect.height//4)
+            pipe_reversed.y = pipe_reversed.orig_y + randrange(pipe.rect.height//4, pipe.rect.height)
+            pipe.y = min(pipe_reversed.y + pipe.rect.height +3*self.bird.image.get_rect().height + randrange(0, pipe.rect.height//2), self.base.y - self.base.image.get_rect().height//2 + 2*pipe.rect.height//5)
             pipe.x = pipe_reversed.x = Settings.WIN_W + pipe.rect.width//2
 
         self.pipe_reque_time += self.app.dt

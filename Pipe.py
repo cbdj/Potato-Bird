@@ -1,5 +1,4 @@
 from SpriteUnit import SpriteUnit
-from random import randrange
 
 class Pipe(SpriteUnit):
     def __init__(self, handler, image, x, y):
