@@ -50,7 +50,7 @@ class SpriteHandler:
         # Creating menu
         self.menu = SpriteUnit(self,self.images['message'], Settings.WIN_W // 2, Settings.WIN_H // 2)
         self._gameover = SpriteUnit(self,self.images['gameover'], Settings.WIN_W // 2, Settings.WIN_H // 2)
-        self.score=Score(self,self.images, Settings.WIN_W // 2, 3*Settings.FONT_SIZE)
+        self.score=Score(self,self.images, Settings.WIN_W // 2, 2*Settings.FONT_SIZE)
 
         # Creating groups
         self.group_background = pg.sprite.GroupSingle(self.background)

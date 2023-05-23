@@ -43,14 +43,4 @@ class Score(SpriteUnit):
                 score_file.write(str(self.best))
 
     def get_score_surface(self, score : int):
-        prefix_best = Exfont.text_speech(pg.font.SysFont(None, Settings.FONT_SIZE), f'Best : ', 'white', True, 2, 'black')
-        surface_best = Exfont.text_speech(pg.font.SysFont(None, Settings.FONT_SIZE), f'{self.best}', 'white', True, 2, 'black')
-        prefix_score = Exfont.text_speech(pg.font.SysFont(None, Settings.FONT_SIZE), f'Score : ', 'white', True, 2, 'black')
-        surface_score = Exfont.text_speech(pg.font.SysFont(None, Settings.FONT_SIZE), f'{score}', 'white', True, 2, 'black')
-        w_prefix = max(prefix_best.get_width(),prefix_score.get_width())
-        w = w_prefix+max(surface_best.get_width(),surface_score.get_width())
-        h_best = max(prefix_best.get_height(),prefix_score.get_height())
-        h = h_best + max(surface_best.get_height(),surface_score.get_height())
-        score_surf = pg.Surface((w, h), pg.SRCALPHA)
-        score_surf.blits(((prefix_best, (0, 0)),(prefix_score, (0, h_best)),(surface_best, (w_prefix, 0)),(surface_score, (w_prefix, h_best))), False)
-        return score_surf
+        return pg.font.SysFont(None, Settings.FONT_SIZE).render( f'Best : {self.best}  Score : {score}', True, 'white')
