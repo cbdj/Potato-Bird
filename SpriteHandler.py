@@ -33,10 +33,11 @@ class SpriteHandler:
         self.background = Background(self, self.images['background-day'], self.images['background-night'], Settings.WIN_W//2, (Settings.WIN_H-self.images['base'].get_height())//2 )
             
         # Creating Pipes sprites
-        pipe_default_ypos = Settings.WIN_H + self.images['pipe-green'].get_height()//2 - self.images['base'].get_height()
-        pipe_reversed_default_ypos = -self.images['pipe-green'].get_height()//2
+        h = self.images['pipe-green'].get_height()
+        pipe_default_ypos = Settings.WIN_H + h/2 - self.images['base'].get_height() - h/3
+        pipe_reversed_default_ypos = pipe_default_ypos - h - 3*self.images[Settings.BIRD_COLOR + 'bird-midflap'].get_height()
         self.pipes = []
-        x=-self.images['pipe-green'].get_width()
+        x=-self.images['pipe-green'].get_width()/2 # pipes are hidden on the left of the screen by default
         for i in range(Settings.PIPE_DENSITY):
             self.pipes.append((Pipe(self, self.images['pipe-green'],x, pipe_default_ypos ),Pipe(self, self.images['reversed-pipe-green'],x, pipe_reversed_default_ypos)))
 
@@ -89,12 +90,11 @@ class SpriteHandler:
         return len(self.group_bird) + len(self.group_collide) + len(self.group_background) + len(self.group_foreground)
 
     def rand_pipe_requeue_interval(self, speed):
-        interval = uniform(2.0,8.0)*(1000.0*(float(self.pipe_width))//float(speed))*0.001
-        return interval
+        return uniform(3.0,8.0)*self.pipe_width/speed
     
     def update_speed(self, speed):
         self.base.vel_x = -speed
-        self.bird.vel_x = -speed
+        self.bird.vel_x = -speed/2
         for (pipe, pipe_reversed) in self.pipes :
             pipe.vel_x = -speed
             pipe_reversed.vel_x = -speed
@@ -176,9 +176,10 @@ class SpriteHandler:
             Reque pipes 
             Used when pipes are out of camera range
             """
-            pipe_reversed.y = pipe_reversed.orig_y + randrange(pipe.rect.height//4, pipe.rect.height)
-            pipe.y = min(pipe_reversed.y + pipe.rect.height +3*self.bird.image.get_rect().height + randrange(0, pipe.rect.height//2), self.base.y - self.base.image.get_rect().height//2 + 2*pipe.rect.height//5)
-            pipe.x = pipe_reversed.x = Settings.WIN_W + pipe.rect.width//2
+            factor = randrange(0, 2*pipe.rect.height//3)
+            pipe.y = pipe.orig_y - factor
+            pipe_reversed.y = pipe_reversed.orig_y - factor
+            pipe.x = pipe_reversed.x = Settings.WIN_W + pipe.rect.width/2
 
         self.pipe_reque_time += self.app.dt
         if self.pipe_reque_time > self.pipe_requeue_interval:
@@ -196,20 +197,14 @@ class SpriteHandler:
                 self.sounds['point'].play()
                 self.score.increment()
                 pipe1.point_given = True
-            if pipe1.x > self.bird.x:
+                break
+            elif pipe1.x > self.bird.x:
                 pipe1.point_given = False
 
 
     def update(self):
-        # if self._paused:
-        #     return
-        # if not self._started:
-        #     return
         self.update_score()
         self.maybe_requeue_pipes()
-                
-        # Update bird's wings position
-       
         self.group_background.update()
         self.group_collide.update()
         self.group_bird.update()
@@ -252,10 +247,12 @@ class SpriteHandler:
         self.group_foreground.add(self.score)
         self.update_speed(Settings.SPEED)
         self._started = True
+        pg.time.set_timer(Settings.EVENT_DAY_NIGHT, Settings.DAY_NIGHT_TIME_MS)
 
     def stop(self):
         self.update_speed(0)
         self._started = False
+        pg.time.set_timer(Settings.EVENT_DAY_NIGHT, 0)
 
     def game_over(self):
         self.group_foreground.add(self._gameover)

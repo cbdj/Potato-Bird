@@ -13,7 +13,6 @@ class Bird(SpriteUnit):
         self.mass = 0.0
         self.dead = False
         self.hit = False
-        self.vel_x = -Settings.SPEED
 
     def translate(self):
         if self.x < Settings.WIN_W/3:
@@ -70,5 +69,4 @@ class Bird(SpriteUnit):
         self.dead=False
         self.hit=False
         self.mass = 0.0
-        self.vel_x = Settings.SPEED
             

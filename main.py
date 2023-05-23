@@ -1,6 +1,6 @@
 import sys
 import os     
-sys.path.append(os.path.abspath(__file__))
+sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 import Settings
 from SpriteHandler import SpriteHandler
 import pygame as pg
@@ -24,7 +24,6 @@ class App:
         self.dt = 0.0
         self.font = pg.font.SysFont('Verdana', Settings.FONT_SIZE//2)
         self.fps_size = (Settings.FONT_SIZE * 13, Settings.FONT_SIZE//2)
-        pg.time.set_timer(Settings.EVENT_DAY_NIGHT, Settings.DAY_NIGHT_TIME_MS)
         self.speed = Settings.SPEED
         self.running = True
         self.display_fps = False
