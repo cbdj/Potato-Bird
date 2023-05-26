@@ -24,9 +24,9 @@ class Bird(SpriteUnit):
         if self.y < 0 :
             self.vel_y *= -1
         self.rect.center = self.x, self.y
-        if self.vel_y > Settings.BUMP_SPEED//10:
+        if self.vel_y > Settings.BUMP_SPEED/5 or self.vel_y < -70*Settings.BUMP_SPEED/100:
             self.update_image(self.image_up)
-        elif self.vel_y < -Settings.BUMP_SPEED//10: 
+        elif self.vel_y < -Settings.BUMP_SPEED/5: 
             self.update_image(self.image_down)
         else : 
             self.update_image(self.image_middle)
@@ -34,7 +34,7 @@ class Bird(SpriteUnit):
             self.rotate()
 
     def rotate(self):
-        self.image.angle += float(self.vel_y) * self.handler.app.dt
+        self.image.angle += self.vel_y * self.handler.app.dt
 
     def bump(self, speed):
         if self.hit:

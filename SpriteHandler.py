@@ -35,22 +35,22 @@ class SpriteHandler:
         # Creating Pipes sprites
         h = self.images['pipe-green'].get_height()
         pipe_default_ypos = Settings.WIN_H + h/2 - self.images['base'].get_height() - h/3
-        pipe_reversed_default_ypos = pipe_default_ypos - h - 3*self.images[Settings.BIRD_COLOR + 'bird-midflap'].get_height()
+        pipe_reversed_default_ypos = pipe_default_ypos - h - 4*self.images[Settings.BIRD_COLOR + 'bird-midflap'].get_height()
         self.pipes = []
         x=-self.images['pipe-green'].get_width()/2 # pipes are hidden on the left of the screen by default
         for i in range(Settings.PIPE_DENSITY):
             self.pipes.append((Pipe(self, self.images['pipe-green'],x, pipe_default_ypos ),Pipe(self, self.images['reversed-pipe-green'],x, pipe_reversed_default_ypos)))
 
         # Creating Base sprite
-        self.base=Base(self, self.images['base'], Settings.WIN_W, Settings.WIN_H-self.images['base'].get_height()//2)
+        self.base=Base(self, self.images['base'], self.images['base'].get_width()/2, Settings.WIN_H-self.images['base'].get_height()/2)
 
         # Creating Bird sprite
         self.bird = Bird(self, self.images[Settings.BIRD_COLOR + 'bird-downflap'], self.images[Settings.BIRD_COLOR + 'bird-midflap'], self.images[Settings.BIRD_COLOR + 'bird-upflap'], Settings.WIN_W // 2, Settings.WIN_H // 2)
 
         # Creating menu
-        self.menu = SpriteUnit(self,self.images['message'], Settings.WIN_W // 2, Settings.WIN_H // 2)
-        self._gameover = SpriteUnit(self,self.images['gameover'], Settings.WIN_W // 2, Settings.WIN_H // 2)
-        self.score=Score(self,self.images, Settings.WIN_W // 2, 2*Settings.FONT_SIZE)
+        self.menu = SpriteUnit(self,self.images['message'], Settings.WIN_W / 2, Settings.WIN_H / 2)
+        self._gameover = SpriteUnit(self,self.images['gameover'], Settings.WIN_W / 2, Settings.WIN_H / 2)
+        self.score=Score(self,self.images, Settings.WIN_W / 2, 2*Settings.FONT_SIZE)
 
         # Creating groups
         self.group_background = pg.sprite.GroupSingle(self.background)
@@ -106,15 +106,6 @@ class SpriteHandler:
         h = self.images['background-day'].get_height() + self.images['base'].get_height()
         return w,h
     
-    def greyscale(self,surface: pg.Surface):
-        arr = pg.surfarray.pixels3d(surface)
-        mean_arr = np.dot(arr[:,:,:], [0.216, 0.587, 0.144])
-        mean_arr3d = mean_arr[..., np.newaxis]
-        new_arr = np.repeat(mean_arr3d[:, :, :], 3, axis=2)
-        ret = pg.surfarray.make_surface(new_arr)
-        ret.set_colorkey((0, 0, 0))
-        return ret
-    
     def load_images(self):
         """ from .png to pygame Surfaces """
         # loading .png images
@@ -130,7 +121,7 @@ class SpriteHandler:
             # create 'message' asset
             flap_py = Exfont.text_speech(font, 'FLAP.PY', 'white', True, 2, 'black')
             get_ready = Exfont.text_speech(font, 'GET READY!', 'green', True, 2, 'black')
-            grey_bird = self.greyscale(images[Settings.BIRD_COLOR + 'bird-midflap'])
+            grey_bird = pg.transform.grayscale(images[Settings.BIRD_COLOR + 'bird-midflap'])
             tap = Exfont.text_speech(half_font, 'TAP!', 'white', True, 1, 'black')
             images['message'] = pg.Surface((images['background-day'].get_width(),images['background-day'].get_height()), pg.SRCALPHA)
             index_w = index_w_bird = images['message'].get_width()//2-grey_bird.get_width()//2
@@ -152,9 +143,9 @@ class SpriteHandler:
     
     def extend_world(self, new_width):
         def extend_image(image, new_width):
-            extended_image = pg.Surface((new_width, image.get_height()))
-            for i in range(1+int(new_width//image.get_width())):
-                extended_image.blit(image, (i*image.get_width(), 0))
+            n = 1+int(new_width/image.get_width())
+            extended_image = pg.Surface((n*image.get_width(), image.get_height()))
+            extended_image.blits([(image, (i*image.get_width(), 0)) for i in range(n)])
             return extended_image
         
         # extend base and background to match screen width

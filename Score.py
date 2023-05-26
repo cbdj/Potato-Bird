@@ -3,7 +3,6 @@ import pygame as pg
 import os
 from pygame._sdl2 import Image, Texture
 from SpriteUnit import SpriteUnit
-import Exfont
 import Settings
 
 class Score(SpriteUnit):
