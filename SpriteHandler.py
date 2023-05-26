@@ -241,6 +241,8 @@ class SpriteHandler:
             self.bird.bump(Settings.BUMP_SPEED)
 
     def start(self):
+        if Settings.platform=='android':
+            self.app.interstitial.load_ad()
         self.app.speed=Settings.SPEED
         self.score.reset()
         self.group_foreground.empty()
@@ -258,6 +260,9 @@ class SpriteHandler:
         self.group_foreground.add(self._gameover)
         self.score.save_best()
         self.stop()
+        if Settings.platform=='android':
+            # get punished
+            self.app.interstitial.show()
 
     def quit(self):
         self.score.save_best()

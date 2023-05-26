@@ -7,6 +7,8 @@ import pygame as pg
 # import pygame.freetype as ft
 from pygame._sdl2.video import Window, Renderer, Texture, Image
 import Exfont
+if Settings.platform=='android':
+    import simpleam
 
 __version__ = "1.0.0"
 
@@ -27,6 +29,10 @@ class App:
         self.speed = Settings.SPEED
         self.running = True
         self.display_fps = False
+        
+        if Settings.platform=='android':
+            simpleam.simpleam_init()
+            self.interstitial = simpleam.Interstitial()
 
     def update(self):
         self.sprite_handler.update()

@@ -44,7 +44,7 @@ requirements = python3,pygame,numpy
 # requirements.source.kivy = ../../kivy
 
 # (str) Presplash of the application
-presplash.filename = %(source.dir)s/assets/favicon.png
+presplash.filename = %(source.dir)s/assets/Empty.png
 
 # (str) Icon of the application
 icon.filename = %(source.dir)s/assets/favicon.png
@@ -81,7 +81,7 @@ fullscreen = 1
 # red, blue, green, black, white, gray, cyan, magenta, yellow, lightgray,
 # darkgray, grey, lightgrey, darkgrey, aqua, fuchsia, lime, maroon, navy,
 # olive, purple, silver, teal.
-#android.presplash_color = #FFFFFF
+android.presplash_color = #00000000
 
 # (string) Presplash animation using Lottie format.
 # see https://lottiefiles.com/ for examples and https://airbnb.design/lottie/
@@ -96,6 +96,7 @@ fullscreen = 1
 # (list) Permissions
 # (See https://python-for-android.readthedocs.io/en/latest/buildoptions/#build-options-1 for all the supported syntaxes and properties)
 #android.permissions = android.permission.INTERNET, (name=android.permission.WRITE_EXTERNAL_STORAGE;maxSdkVersion=18)
+android.permissions = INTERNET, ACCESS_NETWORK_STATE
 
 # (list) features (adds uses-feature -tags to manifest)
 #android.features = android.hardware.usb.host
@@ -107,7 +108,7 @@ fullscreen = 1
 #android.minapi = 21
 
 # (int) Android SDK version to use
-#android.sdk = 20
+#android.sdk = 24
 
 # (str) Android NDK version to use
 #android.ndk = 23b
@@ -201,7 +202,7 @@ fullscreen = 1
 #android.add_resources =
 
 # (list) Gradle dependencies to add
-#android.gradle_dependencies =
+android.gradle_dependencies = com.google.firebase:firebase-ads:19.7.0,com.google.gms:google-services:4.3.15,androidx.work:work-runtime-ktx:2.7.1
 
 # (bool) Enable AndroidX support. Enable when 'android.gradle_dependencies'
 # contains an 'androidx' package, or any package from Kotlin source.
@@ -260,7 +261,7 @@ fullscreen = 1
 #android.wakelock = False
 
 # (list) Android application meta-data to set (key=value format)
-#android.meta_data =
+android.meta_data = com.google.android.gms.ads.APPLICATION_ID=ca-app-pub-3940256099942544~6300978111
 
 # (list) Android library project to add (will be added in the
 # project.properties automatically.)
@@ -273,7 +274,7 @@ fullscreen = 1
 #android.logcat_filters = *:S python:D
 
 # (bool) Android logcat only display log for activity's pid
-#android.logcat_pid_only = False
+android.logcat_pid_only = True
 
 # (str) Android additional adb arguments
 #android.adb_args = -H host.docker.internal
@@ -321,7 +322,7 @@ android.allow_backup = True
 #p4a.fork = kivy
 
 # (str) python-for-android branch to use, defaults to master
-#p4a.branch = master
+p4a.branch = master
 
 # (str) python-for-android specific commit to use, defaults to HEAD, must be within p4a.branch
 #p4a.commit = HEAD
