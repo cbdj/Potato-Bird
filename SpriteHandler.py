@@ -121,7 +121,15 @@ class SpriteHandler:
             # create 'message' asset
             flap_py = Exfont.text_speech(font, 'FLAP.PY', 'white', True, 2, 'black')
             get_ready = Exfont.text_speech(font, 'GET READY!', 'green', True, 2, 'black')
-            grey_bird = pg.transform.grayscale(images[Settings.BIRD_COLOR + 'bird-midflap'])
+            def grayscale(surface : pg.Surface):
+                ret = surface.copy()
+                for x in range(surface.get_width()):
+                    for y in range(surface.get_height()):
+                        pixel: pg.Color = surface.get_at((x, y))
+                        grey_pixel = 0.299 * pixel.r + 0.587 * pixel.g + 0.114 * pixel.b
+                        ret.set_at((x,y), (grey_pixel, grey_pixel, grey_pixel, pixel.a))
+                return ret
+            grey_bird = grayscale(images[Settings.BIRD_COLOR + 'bird-midflap'])
             tap = Exfont.text_speech(half_font, 'TAP!', 'white', True, 1, 'black')
             images['message'] = pg.Surface((images['background-day'].get_width(),images['background-day'].get_height()), pg.SRCALPHA)
             index_w = index_w_bird = images['message'].get_width()//2-grey_bird.get_width()//2
