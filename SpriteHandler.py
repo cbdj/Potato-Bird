@@ -94,7 +94,7 @@ class SpriteHandler:
     
     def update_speed(self, speed):
         self.base.vel_x = -speed
-        self.bird.vel_x = -speed/2
+        self.bird.vel_x = -speed/4
         for (pipe, pipe_reversed) in self.pipes :
             pipe.vel_x = -speed
             pipe_reversed.vel_x = -speed
