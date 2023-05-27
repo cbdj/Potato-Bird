@@ -8,7 +8,7 @@ import pygame as pg
 from pygame._sdl2.video import Window, Renderer, Texture, Image
 import Exfont    
 
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 
 class App:
     def __init__(self):
