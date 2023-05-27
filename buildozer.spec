@@ -261,7 +261,7 @@ android.gradle_dependencies = com.google.firebase:firebase-ads:19.7.0,com.google
 #android.wakelock = False
 
 # (list) Android application meta-data to set (key=value format)
-android.meta_data = com.google.android.gms.ads.APPLICATION_ID=ca-app-pub-3940256099942544~6300978111
+android.meta_data = com.google.android.gms.ads.APPLICATION_ID=ca-app-pub-4493613666001226~6265304991
 
 # (list) Android library project to add (will be added in the
 # project.properties automatically.)
