@@ -241,7 +241,7 @@ class SpriteHandler:
 
     def start(self):
         if Settings.platform=='android':
-            self.app.interstitial.load_ad()
+            self.app.ad_manager.reload()
         self.app.speed=Settings.SPEED
         self.score.reset()
         self.group_foreground.empty()
@@ -261,7 +261,7 @@ class SpriteHandler:
         self.stop()
         if Settings.platform=='android':
             # get punished
-            self.app.interstitial.show()
+            self.app.ad_manager.may_show()
 
     def quit(self):
         self.score.save_best()

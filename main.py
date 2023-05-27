@@ -6,9 +6,7 @@ from SpriteHandler import SpriteHandler
 import pygame as pg
 # import pygame.freetype as ft
 from pygame._sdl2.video import Window, Renderer, Texture, Image
-import Exfont
-if Settings.platform=='android':
-    import simpleam
+import Exfont    
 
 __version__ = "1.0.0"
 
@@ -31,8 +29,8 @@ class App:
         self.display_fps = False
         
         if Settings.platform=='android':
-            simpleam.simpleam_init(Settings.APP_ID)
-            self.interstitial = simpleam.Interstitial(Settings.AD_ID)
+            from AdManager import AdManager 
+            self.ad_manager = AdManager(Settings.APP_ID, Settings.AD_ID)
 
     def update(self):
         self.sprite_handler.update()
@@ -69,6 +67,9 @@ class App:
                     self.speed = Settings.SPEED_INCREASE_FACTOR*self.speed
                     self.sprite_handler.update_speed(self.speed)
                     self.sprite_handler.sounds['swoosh'].play()
+            elif e.type == Settings.EVENT_AD:
+                print('EVENT_AD')
+                self.ad_manager.on_timeout()
 
     def run(self):
         while self.running:

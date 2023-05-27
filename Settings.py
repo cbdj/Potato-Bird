@@ -52,8 +52,11 @@ PIPE_DENSITY = 6
 BUMP_SPEED = 300
 FONT_SIZE = 40
 SPEED = 100 # initial pipe and base speed
-SPEED_INCREASE_FACTOR = 1.3 # speed increase at each day/night event
+SPEED_INCREASE_FACTOR = 1.2 # speed increase at each day/night event
 DAY_NIGHT_TIME_MS = 10000
 EVENT_DAY_NIGHT = pg.USEREVENT+1
 BIRD_MASS_KG = 0.1
+
+AD_TIME_MS = 30000
+EVENT_AD = pg.USEREVENT+2
 
