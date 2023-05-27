@@ -96,7 +96,7 @@ android.presplash_color = #00000000
 # (list) Permissions
 # (See https://python-for-android.readthedocs.io/en/latest/buildoptions/#build-options-1 for all the supported syntaxes and properties)
 #android.permissions = android.permission.INTERNET, (name=android.permission.WRITE_EXTERNAL_STORAGE;maxSdkVersion=18)
-android.permissions = INTERNET, ACCESS_NETWORK_STATE
+android.permissions = INTERNET, ACCESS_NETWORK_STATE, AD_ID 
 
 # (list) features (adds uses-feature -tags to manifest)
 #android.features = android.hardware.usb.host
