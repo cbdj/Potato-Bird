@@ -12,15 +12,26 @@ def get_platform():
         return "linux"
     elif _sys_platform in ('win32', 'cygwin'):
         return 'win'
+        
 platform = get_platform()
+
 if platform=="android":
     base_path=os.path.abspath("/data/data/com.cldejessey.flappy/files/app/")
+    debug=True
+    if debug:
+        APP_ID="ca-app-pub-3940256099942544~3347511713"
+        AD_ID="ca-app-pub-3940256099942544/8691691433"
+    else:
+        APP_ID="ca-app-pub-4493613666001226~6265304991"
+        AD_ID="ca-app-pub-4493613666001226/1483234688"
+        
 elif platform=="win":
     try:
     # PyInstaller creates a temp folder and stores path in _MEIPASS
         base_path = sys._MEIPASS
     except Exception:
         base_path = os.path.abspath(".")
+        
 elif platform=="linux":
     base_path = os.path.abspath(".")
 
@@ -45,3 +56,4 @@ SPEED_INCREASE_FACTOR = 1.3 # speed increase at each day/night event
 DAY_NIGHT_TIME_MS = 10000
 EVENT_DAY_NIGHT = pg.USEREVENT+1
 BIRD_MASS_KG = 0.1
+

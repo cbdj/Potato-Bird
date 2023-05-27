@@ -31,8 +31,8 @@ class App:
         self.display_fps = False
         
         if Settings.platform=='android':
-            simpleam.simpleam_init()
-            self.interstitial = simpleam.Interstitial()
+            simpleam.simpleam_init(Settings.APP_ID)
+            self.interstitial = simpleam.Interstitial(Settings.AD_ID)
 
     def update(self):
         self.sprite_handler.update()
