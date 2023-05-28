@@ -178,7 +178,7 @@ android.ndk = 25b
 
 # (list) List of Java files to add to the android project (can be java or a
 # directory containing the files)
-#android.add_src =
+android.add_src = java 
 
 # (list) Android AAR archives to add
 #android.add_aars =
@@ -202,7 +202,7 @@ android.ndk = 25b
 #android.add_resources =
 
 # (list) Gradle dependencies to add
-android.gradle_dependencies = com.google.firebase:firebase-ads:19.7.0,com.google.gms:google-services:4.3.15,androidx.work:work-runtime-ktx:2.7.1
+android.gradle_dependencies = com.google.firebase:firebase-ads:22.1.0,com.google.gms:google-services:4.3.15,androidx.work:work-runtime-ktx:2.7.1
 
 # (bool) Enable AndroidX support. Enable when 'android.gradle_dependencies'
 # contains an 'androidx' package, or any package from Kotlin source.

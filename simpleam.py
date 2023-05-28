@@ -1,5 +1,5 @@
 try:
-    from jnius import autoclass, PythonJavaClass, java_method #type: ignore
+    from jnius import autoclass, PythonJavaClass, JavaClass, java_method
     from android.runnable import run_on_ui_thread #type: ignore
     from time import sleep
 except:
@@ -16,20 +16,24 @@ class JC:
     AdView = autoclass("com.google.android.gms.ads.AdView")
     Bundle = autoclass("android.os.Bundle")
     Gravity = autoclass("android.view.Gravity")
-    InterstitialAd = autoclass("com.google.android.gms.ads.InterstitialAd")
+    InterstitialAd = autoclass("com.google.android.gms.ads.interstitial.InterstitialAd")
     LayoutParams = autoclass("android.view.ViewGroup$LayoutParams")
     LinearLayout = autoclass("android.widget.LinearLayout")
     MobileAds = autoclass("com.google.android.gms.ads.MobileAds")
+    # Some firebase callbacks mecanisms are abstract class which one cannot manage with pyjnius
+    # In that case we have to provide our own java class that extends firebase api and can take an pythonizable interface as constructor parameter
+    InterstitialAdLoadCallback = autoclass("com.pygameadmob.pygameadmobInterstitialAdLoadCallback") # instead of "com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback"
 
 def simpleam_init(app_id: str = None):
     """ Initializes AdMob MobileAds class. Use this function at the start to use all functionality. 
         \nTakes AdMob app id as an argument. Test app Ids is used if no argument was supplied"""
     app_id = app_id if app_id else "ca-app-pub-3940256099942544~3347511713"
-    JC.MobileAds.initialize(JC.Activity.mActivity, app_id)
+    JC.MobileAds.initialize(JC.Activity.mActivity)
 
 class AdObject:
     def __init__(self, ad_id):
-        self.AD_ID = ad_id
+        self.adUnitId = ad_id
+        self.context = JC.Activity.mActivity
         self.admob_obj = None
         self.loaded = False
 
@@ -37,6 +41,9 @@ class AdObject:
     def load_ad(self, filters: dict = {}) -> None:
         self.loaded = False
         self.admob_obj.loadAd(self.get_builder(filters).build())
+        
+    def is_loaded(self) -> bool:
+        return self.loaded
     
     @run_on_ui_thread
     def destroy(self) -> None:
@@ -113,21 +120,37 @@ class Interstitial(AdObject):
     	    \nTEST video interstitial: `ca-app-pub-3940256099942544/8691691433`.
     	    \nIf no argument was supplied, interstitial would be ALWAYS image."""
         super().__init__(ad_id)
-        self.admob_obj = JC.InterstitialAd(JC.Activity.mActivity)
-        self.admob_obj.setAdUnitId(self.AD_ID)
+        self.callback = self.InterstitialAdLoadCallback(self.loaded_ad_callback)
+ 
+    class InterstitialAdLoadCallback(PythonJavaClass):
+        "Callback to be invoked when an ad finishes loading."
+        __javainterfaces__  = ("com.pygameadmob.pygameadmobInterstitialAdLoadCallbackInterface", )
+        __javacontext__ = "app"
 
-    @run_on_ui_thread
-    def _is_loaded(self) -> None:
-        self.loaded = self.admob_obj.isLoaded()
+        def __init__(self, callback):
+            self._callback = callback
+
+        @java_method('(Lcom/google/android/gms/ads/AdError;)V')
+        def onAdFailedToLoad(self, loadAdError):
+            print('pygameadmob: Failed to load interstitial ad')
+
+        @java_method("(Lcom/google/android/gms/ads/interstitial/InterstitialAd;)V")
+        def onAdLoaded(self, ad):
+            self._callback(ad)
         
-    def is_loaded(self) -> bool:
-        self._is_loaded()
-        return self.loaded
-
+    def loaded_ad_callback(self, ad):
+        self.loaded = True
+        self.admob_obj = ad
+        
+    @run_on_ui_thread
+    def load_ad(self, filters: dict = {}) -> None:
+        self.loaded = False
+        JC.InterstitialAd.load(self.context, self.adUnitId, self.get_builder(filters).build(),JC.InterstitialAdLoadCallback(self.callback))
+        
     @run_on_ui_thread
     def show(self) -> None:
         if self.is_loaded():
-            self.admob_obj.show()
+            self.admob_obj.show(self.context)
 
 class Rewarded(AdObject):
     " AdMob rewarded ad class. "
@@ -232,3 +255,6 @@ class RewardedCallbacks:
 
     def on_rewarded_load_fail(self, num):
         print("SIMPLEAM: Ad failed to load!")
+        
+
+
