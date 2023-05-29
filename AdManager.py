@@ -18,7 +18,9 @@ class AdManager():
             
     def reload(self): 
         print('AdManager : reloading')
-        if not self.loaded:
+        if self.interstitial.is_loading():
+            return
+        if not self.loaded or not self.interstitial.is_loaded():
             print('AdManager : reset timer')
             self.interstitial.load_ad()
             self.loaded = True

@@ -36,14 +36,20 @@ class AdObject:
         self.context = JC.Activity.mActivity
         self.admob_obj = None
         self.loaded = False
+        self.loading = False
 
     @run_on_ui_thread
     def load_ad(self, filters: dict = {}) -> None:
         self.loaded = False
+        self.loading = True
         self.admob_obj.loadAd(self.get_builder(filters).build())
+        self.loaded = True
         
     def is_loaded(self) -> bool:
         return self.loaded
+        
+    def is_loading(self) -> bool:
+        return self.loading
     
     @run_on_ui_thread
     def destroy(self) -> None:
@@ -120,27 +126,35 @@ class Interstitial(AdObject):
     	    \nTEST video interstitial: `ca-app-pub-3940256099942544/8691691433`.
     	    \nIf no argument was supplied, interstitial would be ALWAYS image."""
         super().__init__(ad_id)
-        self.callback = self.InterstitialAdLoadCallback(self.loaded_ad_callback)
+        self.callback = self.InterstitialAdLoadCallback(self.loaded_ad_callback, self.ad_failed_callback)
  
     class InterstitialAdLoadCallback(PythonJavaClass):
         "Callback to be invoked when an ad finishes loading."
         __javainterfaces__  = ("com.pygameadmob.pygameadmobInterstitialAdLoadCallbackInterface", )
         __javacontext__ = "app"
 
-        def __init__(self, callback):
-            self._callback = callback
+        def __init__(self, ad_loaded_callback, ad_failed_callback):
+            self.ad_loaded_callback = ad_loaded_callback
+            self.ad_failed_callback = ad_failed_callback
 
-        @java_method('(Lcom/google/android/gms/ads/AdError;)V')
+        @java_method('(Lcom/google/android/gms/ads/LoadAdError;)V')
         def onAdFailedToLoad(self, loadAdError):
-            print('pygameadmob: Failed to load interstitial ad')
+            self.ad_failed_callback(loadAdError)
 
         @java_method("(Lcom/google/android/gms/ads/interstitial/InterstitialAd;)V")
         def onAdLoaded(self, ad):
-            self._callback(ad)
+            self.ad_loaded_callback(ad)
         
     def loaded_ad_callback(self, ad):
+        self.loading = False
         self.loaded = True
         self.admob_obj = ad
+        
+    def ad_failed_callback(self, error):
+        self.loading = False
+        self.loaded = False
+        print('pygameadmob: Failed to load interstitial ad')
+        print(error.toString())
         
     @run_on_ui_thread
     def load_ad(self, filters: dict = {}) -> None:

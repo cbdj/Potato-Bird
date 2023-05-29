@@ -6,9 +6,6 @@ import com.google.android.gms.ads.interstitial.InterstitialAd;
 
 public class pygameadmobInterstitialAdLoadCallback extends InterstitialAdLoadCallback{
 	pygameadmobInterstitialAdLoadCallbackInterface python_callbacks;
-    public int test() {
-        return 300;
-    }
 	public pygameadmobInterstitialAdLoadCallback(pygameadmobInterstitialAdLoadCallbackInterface my_interface){
 		python_callbacks = my_interface;
 	}
