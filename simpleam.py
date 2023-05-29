@@ -16,14 +16,17 @@ class JC:
     AdView = autoclass("com.google.android.gms.ads.AdView")
     Bundle = autoclass("android.os.Bundle")
     Gravity = autoclass("android.view.Gravity")
+    RewardedAd = autoclass("com.google.android.gms.ads.rewarded.RewardedAd")
     InterstitialAd = autoclass("com.google.android.gms.ads.interstitial.InterstitialAd")
     LayoutParams = autoclass("android.view.ViewGroup$LayoutParams")
     LinearLayout = autoclass("android.widget.LinearLayout")
     MobileAds = autoclass("com.google.android.gms.ads.MobileAds")
-    # Some firebase callbacks mecanisms are abstract class which one cannot manage with pyjnius
-    # In that case we have to provide our own java class that extends firebase api and can take an pythonizable interface as constructor parameter
+    # Some firebase callbacks mecanisms are abstract class which pyjnius cannot manage
+    # In that case we have to provide our own java class that extends firebase api and can take an jnius-managed interface as constructor parameter
     InterstitialAdLoadCallback = autoclass("com.pygameadmob.pygameadmobInterstitialAdLoadCallback") # instead of "com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback"
-
+    RewardedAdLoadCallback = autoclass("com.pygameadmob.pygameadmobRewardedAdLoadCallback") # instead of "com.google.android.gms.ads.rewarded.RewardedAdLoadCallback"
+    FullScreenContentCallback  = autoclass("com.pygameadmob.pygameadmobFullScreenContentCallback") # instead of "com.google.android.gms.ads.FullScreenContentCallback"
+    
 def simpleam_init(app_id: str = None):
     """ Initializes AdMob MobileAds class. Use this function at the start to use all functionality. 
         \nTakes AdMob app id as an argument. Test app Ids is used if no argument was supplied"""
@@ -43,9 +46,15 @@ class AdObject:
         self.loaded = False
         self.loading = True
         self.admob_obj.loadAd(self.get_builder(filters).build())
+        self.loading = False
         self.loaded = True
         
+    @run_on_ui_thread
+    def _is_loaded(self) -> None:
+        self.loaded = self.admob_obj.isLoaded()
+
     def is_loaded(self) -> bool:
+        self._is_loaded()
         return self.loaded
         
     def is_loading(self) -> bool:
@@ -100,7 +109,7 @@ class Banner(AdObject):
         banner_size = size if isinstance(size, tuple) else getattr(JC.AdSize, size, JC.AdSize.SMART_BANNER)
 
         self.admob_obj = JC.AdView(JC.Activity.mActivity)
-        self.admob_obj.setAdUnitId(self.AD_ID)
+        self.admob_obj.setAdUnitId(self.adUnitId)
         self.admob_obj.setAdSize(banner_size)
         self.admob_obj.setVisibility(JC.View.GONE)
         adLayoutParams = JC.LayoutParams(JC.LayoutParams.MATCH_PARENT, JC.LayoutParams.WRAP_CONTENT)
@@ -110,7 +119,7 @@ class Banner(AdObject):
         layout.addView(self.admob_obj)
         layoutParams = JC.LayoutParams(JC.LayoutParams.MATCH_PARENT, JC.LayoutParams.MATCH_PARENT)
         layout.setLayoutParams(layoutParams)
-        JC.Activity.addContentView(layout, layoutParams)
+        self.context.addContentView(layout, layoutParams)
 
     @run_on_ui_thread
     def set_visibility(self, visibility: bool = True) -> None:
@@ -126,9 +135,9 @@ class Interstitial(AdObject):
     	    \nTEST video interstitial: `ca-app-pub-3940256099942544/8691691433`.
     	    \nIf no argument was supplied, interstitial would be ALWAYS image."""
         super().__init__(ad_id)
-        self.callback = self.InterstitialAdLoadCallback(self.loaded_ad_callback, self.ad_failed_callback)
+        self.callback = self._InterstitialAdLoadCallback(self.loaded_ad_callback, self.ad_failed_callback)
  
-    class InterstitialAdLoadCallback(PythonJavaClass):
+    class _InterstitialAdLoadCallback(PythonJavaClass):
         "Callback to be invoked when an ad finishes loading."
         __javainterfaces__  = ("com.pygameadmob.pygameadmobInterstitialAdLoadCallbackInterface", )
         __javacontext__ = "app"
@@ -155,16 +164,41 @@ class Interstitial(AdObject):
         self.loaded = False
         print('pygameadmob: Failed to load interstitial ad')
         print(error.toString())
+    
+    def is_loaded(self) -> bool:
+        return self.loaded
         
     @run_on_ui_thread
     def load_ad(self, filters: dict = {}) -> None:
         self.loaded = False
+        self.loading = True
         JC.InterstitialAd.load(self.context, self.adUnitId, self.get_builder(filters).build(),JC.InterstitialAdLoadCallback(self.callback))
         
     @run_on_ui_thread
     def show(self) -> None:
         if self.is_loaded():
             self.admob_obj.show(self.context)
+
+class FullScreenContentCallbacks:
+    def onAdClicked (self):
+        print("pygameadmob: onAdClicked")
+    def onAdDismissedFullScreenContent(self):
+        print("pygameadmob: onAdDismissedFullScreenContent")
+    def onAdFailedToShowFullScreenContent(self, adError):
+        print(f"pygameadmob: onAdFailedToShowFullScreenContent : {adError.toString()}")
+    def onAdImpression(self):
+        print("pygameadmob: onAdImpression")
+    def onAdShowedFullScreenContent(self):
+        print("pygameadmob: onAdShowedFullScreenContent")
+
+class PaidEventCallbacks:
+    def onPaidEvent(self, value):
+        print(f"pygameadmob: on_rewarded_loaded : code : {value.getCurrencyCode()}, precision : {value.getPrecisionType()}, value: {value.getValueMicros()}")      
+        
+class OnUserEarnedRewardCallbacks:
+    def onUserEarnedReward(self, reward):
+        print(f"pygameadmob: onUserEarnedReward : amount : {reward.getAmount()}, type  : {reward.getType()}")      
+
 
 class Rewarded(AdObject):
     " AdMob rewarded ad class. "
@@ -176,99 +210,106 @@ class Rewarded(AdObject):
            \nYou have to set up it like this: `rewarded.set_listener(my_callback_listener)
         """
         super().__init__(ad_id)
+        self._ad_load_callback = self._RewardedAdLoadCallback(self.loaded_ad_callback, self.ad_failed_callback)
+        self.myFullScreenContentCallbacks = FullScreenContentCallbacks()
+        self._full_screen_content_callback = self._FullScreenContentCallback(self.myFullScreenContentCallbacks)
+        self.myOnUserEarnedRewardCallbacks = OnUserEarnedRewardCallbacks()
+        self._on_user_earned_reward_listener = self._OnUserEarnedRewardListener(self.myOnUserEarnedRewardCallbacks)
         self.viewed_ad = False
-        self.admob_obj = JC.MobileAds.getRewardedVideoAdInstance(JC.Activity.mActivity)
     
-    @run_on_ui_thread
-    def set_listener(self, callback_listener):
-        self.rewarded_listener = RVListener(callback_listener, self)
-        self.admob_obj.setRewardedVideoAdListener(self.rewarded_listener)
+    class OnPaidEventListener(PythonJavaClass):
+        __javainterfaces__ = ("com.google.android.gms.ads.OnPaidEventListener")
+        __javacontext__ = "app"
 
+        def __init__(self, paid_event_listener : PaidEventCallbacks):
+            self._paid_event_listener = paid_event_listener
+
+        @java_method("(Lcom/google/android/gms/ads/AdValue)V")
+        def onPaidEvent(self, value):
+            self._paid_event_listener.onPaidEvent(value)
+            
+    class _OnUserEarnedRewardListener(PythonJavaClass):
+        __javainterfaces__ = ("com.google.android.gms.ads.OnUserEarnedRewardListener")
+        __javacontext__ = "app"
+
+        def __init__(self, user_earned_reward_listener):
+            self._user_earned_reward_listener = user_earned_reward_listener
+
+        @java_method("(Lcom/google/android/gms/ads/rewarded/RewardItem)V")
+        def onUserEarnedReward(self, reward):
+            self._user_earned_reward_listener.onUserEarnedReward(reward)
+
+    class _FullScreenContentCallback (PythonJavaClass):
+        __javainterfaces__ = ("com.pygameadmob.pygameadmobFullScreenContentCallbackInterface")
+        __javacontext__ = "app"
+
+        def __init__(self, full_screen_content_callback ):
+            self._full_screen_content_callback = full_screen_content_callback
+
+        @java_method("()V")
+        def onAdClicked (self):
+            self._full_screen_content_callback.onAdClicked()
+        @java_method("()V")
+        def onAdDismissedFullScreenContent(self):
+            self._full_screen_content_callback.onAdDismissedFullScreenContent()
+        @java_method("(Lcom/google/android/gms/ads/AdError;)V")
+        def onAdFailedToShowFullScreenContent(self, adError):
+            self._full_screen_content_callback.onAdFailedToShowFullScreenContent(adError)
+        @java_method("()V")
+        def onAdImpression(self):
+            self._full_screen_content_callback.onAdImpression()
+        @java_method("()V")
+        def onAdShowedFullScreenContent(self):
+            self._full_screen_content_callback.onAdShowedFullScreenContent()
+        
+    class _RewardedAdLoadCallback(PythonJavaClass):
+        "Callback to be invoked when an ad finishes loading."
+        __javainterfaces__  = ("com.pygameadmob.pygameadmobRewardedAdLoadCallbackInterface", )
+        __javacontext__ = "app"
+
+        def __init__(self, ad_loaded_callback, ad_failed_callback):
+            self.ad_loaded_callback = ad_loaded_callback
+            self.ad_failed_callback = ad_failed_callback
+
+        @java_method('(Lcom/google/android/gms/ads/LoadAdError;)V')
+        def onAdFailedToLoad(self, loadAdError):
+            self.ad_failed_callback(loadAdError)
+
+        @java_method("(Lcom/google/android/gms/ads/rewarded/RewardedAd;)V")
+        def onAdLoaded(self, ad):
+            self.ad_loaded_callback(ad)
+    
+    @run_on_ui_thread    
+    def loaded_ad_callback(self, ad : JC.RewardedAd):
+        self.loading = False
+        self.loaded = True
+        ad.setFullScreenContentCallback(JC.FullScreenContentCallback(self._full_screen_content_callback))
+        self.admob_obj = ad
+        
+    def ad_failed_callback(self, error):
+        self.loading = False
+        self.loaded = False
+        print('pygameadmob: Failed to load rewarded ad')
+        print(error.toString())
+        
+    def set_FullScreenContentCallbacks(self, callbacks: FullScreenContentCallbacks):
+        self._full_screen_content_callback = self._FullScreenContentCallback(callbacks)
+        
+    def set_OnUserEarnedRewardListener(self, callback: OnUserEarnedRewardCallbacks):
+        self._on_user_earned_reward_listener = self._OnUserEarnedRewardListener(callback)
+
+    def is_loaded(self) -> bool:
+        return self.loaded
+        
     @run_on_ui_thread
     def load_ad(self, filters: dict = {}) -> None:
         self.loaded = False
-        self.admob_obj.loadAd(self.AD_ID, self.get_builder(filters).build())
-
-    @run_on_ui_thread
-    def _is_loaded(self) -> None:
-        self.loaded = self.admob_obj.isLoaded()
-
-    @run_on_ui_thread
-    def _show(self) -> None:
-        self.admob_obj.show()
+        self.loading = True
+        JC.RewardedAd.load(self.context, self.adUnitId, self.get_builder(filters).build(),JC.RewardedAdLoadCallback(self._ad_load_callback))
         
-    def is_loaded(self) -> bool:
-        self._is_loaded()
-        return self.loaded
-    
+    @run_on_ui_thread
     def show(self) -> None:
-    	if self.is_loaded():
-            while not self.viewed_ad:
-                self._show()
-                sleep(0.15)
-
-class RVListener(PythonJavaClass):
-    "AdMob revarded video listener class."
-    __javainterfaces__ = ("com.google.android.gms.ads.reward.RewardedVideoAdListener", )
-    __javacontext__ = "app"
-
-    def __init__(self, reward_listener, rewarded_object):
-        self._rewarded = rewarded_object
-        self._listener = reward_listener
-
-    @java_method("()V")
-    def onRewardedVideoAdLoaded(self):
-        self._rewarded.viewed_ad = False
-        self._listener.on_rewarded_loaded()
-
-    @java_method("()V")
-    def onRewardedVideoAdOpened(self):
-        self._listener.on_rewarded_opened()
-
-    @java_method("()V")
-    def onRewardedVideoStarted(self):
-        self._listener.on_rewarded_load_fail
-
-    @java_method("()V")
-    def onRewardedVideoAdClosed(self):
-        self._rewarded.viewed_ad = True
-        self._listener.on_rewarded_closed()
-
-    @java_method("(Lcom/google/android/gms/ads/reward/RewardItem;)V")
-    def onRewarded(self, reward):
-        self._listener.on_rewarded_success(reward)
-
-    @java_method("()V")
-    def onRewardedVideoAdLeftApplication(self):
-        self._rewarded.viewed_ad = True
-        self._listener.on_rewarded_left()
-
-    @java_method("(I)V")
-    def onRewardedVideoAdFailedToLoad(self, num):
-        self._rewarded.viewed_ad = False
-        self._listener.on_rewarded_load_fail(num)
-
-class RewardedCallbacks:
-    def on_rewarded_loaded(self):
-        print("SIMPLEAM: Ad is loaded!")
-
-    def on_rewarded_opened(self):
-        print("SIMPLEAM: Ad is opened!")
-
-    def on_rewarded_started(self):
-        print("SIMPLEAM: Ad is started!")
-
-    def on_rewarded_closed(self):
-        print("SIMPLEAM: Ad closed!")
-
-    def on_rewarded_success(self, reward):
-        print(f"SIMPLEAM: Ad succesfully ended!")
-
-    def on_rewarded_left(self):
-        print("SIMPLEAM: Ad left application!")
-
-    def on_rewarded_load_fail(self, num):
-        print("SIMPLEAM: Ad failed to load!")
+        if self.is_loaded():
+            self.admob_obj.show(self.context, self._on_user_earned_reward_listener)
         
-
 

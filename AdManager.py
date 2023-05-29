@@ -5,6 +5,9 @@ class AdManager():
     def __init__(self,app_id : str, ad_id : str):
         simpleam.simpleam_init(app_id)
         self.interstitial = simpleam.Interstitial(ad_id)
+        # self.banner = simpleam.Banner()
+        # self.banner.load_ad()
+        # self.rewarded = simpleam.Rewarded()
         self.timeout = False
         self.loaded = False
         
@@ -29,4 +32,5 @@ class AdManager():
     def on_timeout(self):
         print('AdManager : timeout')
         self.timeout = True
+        # self.banner.set_visibility(not self.banner.visible)
         
