@@ -224,7 +224,7 @@ class Rewarded(AdObject):
         def __init__(self, paid_event_listener : PaidEventCallbacks):
             self._paid_event_listener = paid_event_listener
 
-        @java_method("(Lcom/google/android/gms/ads/AdValue)V")
+        @java_method("(Lcom/google/android/gms/ads/AdValue;)V")
         def onPaidEvent(self, value):
             self._paid_event_listener.onPaidEvent(value)
             
@@ -235,7 +235,7 @@ class Rewarded(AdObject):
         def __init__(self, user_earned_reward_listener):
             self._user_earned_reward_listener = user_earned_reward_listener
 
-        @java_method("(Lcom/google/android/gms/ads/rewarded/RewardItem)V")
+        @java_method("(Lcom/google/android/gms/ads/rewarded/RewardItem;)V")
         def onUserEarnedReward(self, reward):
             self._user_earned_reward_listener.onUserEarnedReward(reward)
 
