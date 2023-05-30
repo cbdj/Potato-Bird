@@ -202,7 +202,7 @@ android.add_src = java
 #android.add_resources =
 
 # (list) Gradle dependencies to add
-android.gradle_dependencies = com.google.firebase:firebase-ads:22.1.0,com.google.gms:google-services:4.3.15,androidx.work:work-runtime-ktx:2.7.1
+android.gradle_dependencies = com.google.android.gms:play-services-ads:22.1.0,com.google.gms:google-services:4.3.15,androidx.work:work-runtime:2.7.1
 
 # (bool) Enable AndroidX support. Enable when 'android.gradle_dependencies'
 # contains an 'androidx' package, or any package from Kotlin source.

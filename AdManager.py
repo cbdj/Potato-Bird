@@ -1,13 +1,13 @@
-import simpleam
+import pygameadmob
 import pygame as pg
 import Settings
 class AdManager():
     def __init__(self,app_id : str, ad_id : str):
-        simpleam.simpleam_init(app_id)
-        self.ad = simpleam.Interstitial(ad_id)
-        # self.banner = simpleam.Banner()
+        pygameadmob.pygameadmob_init(app_id)
+        self.ad = pygameadmob.Interstitial(ad_id)
+        # self.banner = pygameadmob.Banner()
         # self.banner.load_ad()
-        # self.ad = simpleam.Rewarded()
+        # self.ad = pygameadmob.Rewarded()
         self.timeout = False
         self.loaded = False
         
