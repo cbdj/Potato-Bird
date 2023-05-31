@@ -30,7 +30,7 @@ class App:
         
         if Settings.platform=='android':
             from AdManager import AdManager 
-            self.ad_manager = AdManager(Settings.APP_ID, Settings.AD_ID)
+            self.ad_manager = AdManager(Settings.AD_ID)
 
     def update(self):
         self.sprite_handler.update()
