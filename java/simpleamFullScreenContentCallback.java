@@ -1,11 +1,11 @@
-package com.pygameadmob;
-import com.pygameadmob.pygameadmobFullScreenContentCallbackInterface;
+package com.simpleam;
+import com.simpleam.simpleamFullScreenContentCallbackInterface;
 import com.google.android.gms.ads.FullScreenContentCallback;
 import com.google.android.gms.ads.AdError;
 
-public class pygameadmobFullScreenContentCallback extends FullScreenContentCallback{
-	pygameadmobFullScreenContentCallbackInterface python_callbacks;
-	public pygameadmobFullScreenContentCallback(pygameadmobFullScreenContentCallbackInterface my_interface){
+public class simpleamFullScreenContentCallback extends FullScreenContentCallback{
+	simpleamFullScreenContentCallbackInterface python_callbacks;
+	public simpleamFullScreenContentCallback(simpleamFullScreenContentCallbackInterface my_interface){
 		python_callbacks = my_interface;
 	}
     @Override

@@ -21,12 +21,12 @@ class JavaBridge:
     MobileAds = autoclass("com.google.android.gms.ads.MobileAds")
     # Since version 20.0 of play-services-ads some callbacks mecanisms are abstract class which pyjnius cannot manage
     # In that case we have to provide our own java class that extends admob api and can take a jnius-managed interface as constructor parameter
-    AdListener = autoclass("com.pygameadmob.pygameadmobAdListener") # instead of "com.google.android.gms.ads.AdListener"
-    InterstitialAdLoadCallback = autoclass("com.pygameadmob.pygameadmobInterstitialAdLoadCallback") # instead of "com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback"
-    RewardedAdLoadCallback = autoclass("com.pygameadmob.pygameadmobRewardedAdLoadCallback") # instead of "com.google.android.gms.ads.rewarded.RewardedAdLoadCallback"
-    FullScreenContentCallback  = autoclass("com.pygameadmob.pygameadmobFullScreenContentCallback") # instead of "com.google.android.gms.ads.FullScreenContentCallback"
+    AdListener = autoclass("com.simpleam.simpleamAdListener") # instead of "com.google.android.gms.ads.AdListener"
+    InterstitialAdLoadCallback = autoclass("com.simpleam.simpleamInterstitialAdLoadCallback") # instead of "com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback"
+    RewardedAdLoadCallback = autoclass("com.simpleam.simpleamRewardedAdLoadCallback") # instead of "com.google.android.gms.ads.rewarded.RewardedAdLoadCallback"
+    FullScreenContentCallback  = autoclass("com.simpleam.simpleamFullScreenContentCallback") # instead of "com.google.android.gms.ads.FullScreenContentCallback"
     
-def pygameadmob_init():
+def simpleam_init():
     """ Initializes AdMob MobileAds class. Use this function at the start to use all functionality. 
         \nMake sure your APPLICATION_ID is set in your buildozer.spec like this:
         \nandroid.meta_data = com.google.android.gms.ads.APPLICATION_ID=ca-app-pub-3940256099942544~3347511713"""
@@ -67,23 +67,23 @@ class AdObject:
 
 class AdListener:
     def onAdClicked(self):
-        print("pygameadmob: AdListener : onAdClicked")
+        print("simpleam: AdListener : onAdClicked")
     def onAdClosed(self):
-        print("pygameadmob: AdListener : onAdClosed")
+        print("simpleam: AdListener : onAdClosed")
     def onAdFailedToLoad(self, adError):
-        print(f"pygameadmob: AdListener : onAdFailedToLoad : {adError.toString()}")
+        print(f"simpleam: AdListener : onAdFailedToLoad : {adError.toString()}")
     def onAdImpression(self):
-        print("pygameadmob: AdListener : onAdImpression")
+        print("simpleam: AdListener : onAdImpression")
     def onAdLoaded(self):
-        print("pygameadmob: AdListener : onAdLoaded")
+        print("simpleam: AdListener : onAdLoaded")
     def onAdOpened(self):
-        print("pygameadmob: AdListener : onAdOpened")
+        print("simpleam: AdListener : onAdOpened")
     def onAdSwipeGestureClicked(self):
-        print("pygameadmob: AdListener : onAdSwipeGestureClicked")
+        print("simpleam: AdListener : onAdSwipeGestureClicked")
 
 class Banner(AdObject, PythonJavaClass):
     " AdMob banner ad class. "
-    __javainterfaces__ = ("com.pygameadmob.pygameadmobAdListenerInterface", )
+    __javainterfaces__ = ("com.simpleam.simpleamAdListenerInterface", )
     __javacontext__ = "app"
     @run_on_ui_thread
     def __init__(self, ad_id: str = TEST_BANNER_ID, position = "BOTTOM", size = "SMART_BANNER"):
@@ -91,8 +91,8 @@ class Banner(AdObject, PythonJavaClass):
     		\nIf you want to use custom size - pass tuple as an argument with 2 integers.
             \n(Take in mind, some sizes might NOT work)
     		\nIf you want to use AdMob constant for position or size, you have to pass a string argument.
-    		\nFor example: `pygameadmob.Banner("ad_id", position = "LEFT", size = "SMART_BANNER")`,
-    		\nor: `pygameadmob.Banner("ad_id", position = "CENTER", size = (400, 200))`.
+    		\nFor example: `simpleam.Banner("ad_id", position = "LEFT", size = "SMART_BANNER")`,
+    		\nor: `simpleam.Banner("ad_id", position = "CENTER", size = (400, 200))`.
             \nBanner can take only custom size argument. Position always takes a constant.
 
     		\n**All banner size constants:**
@@ -182,7 +182,7 @@ class Banner(AdObject, PythonJavaClass):
 
 class Interstitial(AdObject, PythonJavaClass):
     " AdMob interstitial ad class. "
-    __javainterfaces__  = ("com.pygameadmob.pygameadmobInterstitialAdLoadCallbackInterface", )
+    __javainterfaces__  = ("com.simpleam.simpleamInterstitialAdLoadCallbackInterface", )
     __javacontext__ = "app"
     def __init__(self, ad_id: str = TEST_INTERSTITIAL_ID):
         """ Interstitial has 2 variations which depend on AdMob ID.
@@ -195,7 +195,7 @@ class Interstitial(AdObject, PythonJavaClass):
     def onAdFailedToLoad(self, loadAdError):
         self._loading = False
         self._loaded = False
-        print('pygameadmob: Failed to load interstitial ad')
+        print('simpleam: Failed to load interstitial ad')
         print(loadAdError.toString())
 
     @java_method("(Lcom/google/android/gms/ads/interstitial/InterstitialAd;)V")
@@ -217,23 +217,23 @@ class Interstitial(AdObject, PythonJavaClass):
 
 class FullScreenContentCallbacks:
     def onAdClicked (self):
-        print("pygameadmob: FullScreenContentCallbacks : onAdClicked")
+        print("simpleam: FullScreenContentCallbacks : onAdClicked")
     def onAdDismissedFullScreenContent(self):
-        print("pygameadmob: FullScreenContentCallbacks : onAdDismissedFullScreenContent")
+        print("simpleam: FullScreenContentCallbacks : onAdDismissedFullScreenContent")
     def onAdFailedToShowFullScreenContent(self, adError):
-        print(f"pygameadmob: FullScreenContentCallbacks : onAdFailedToShowFullScreenContent : {adError.toString()}")
+        print(f"simpleam: FullScreenContentCallbacks : onAdFailedToShowFullScreenContent : {adError.toString()}")
     def onAdImpression(self):
-        print("pygameadmob: FullScreenContentCallbacks : onAdImpression")
+        print("simpleam: FullScreenContentCallbacks : onAdImpression")
     def onAdShowedFullScreenContent(self):
-        print("pygameadmob: FullScreenContentCallbacks : onAdShowedFullScreenContent")
+        print("simpleam: FullScreenContentCallbacks : onAdShowedFullScreenContent")
 
 class PaidEventCallbacks:
     def onPaidEvent(self, value):
-        print(f"pygameadmob: PaidEventCallbacks : onPaidEvent : code : {value.getCurrencyCode()}, precision : {value.getPrecisionType()}, value: {value.getValueMicros()}")      
+        print(f"simpleam: PaidEventCallbacks : onPaidEvent : code : {value.getCurrencyCode()}, precision : {value.getPrecisionType()}, value: {value.getValueMicros()}")      
         
 class OnUserEarnedRewardCallbacks:
     def onUserEarnedReward(self, reward):
-        print(f"pygameadmob: OnUserEarnedRewardCallbacks : onUserEarnedReward : amount : {reward.getAmount()}, type  : {reward.getType()}")      
+        print(f"simpleam: OnUserEarnedRewardCallbacks : onUserEarnedReward : amount : {reward.getAmount()}, type  : {reward.getType()}")      
 
 
 class Rewarded(AdObject, PythonJavaClass):
@@ -241,8 +241,8 @@ class Rewarded(AdObject, PythonJavaClass):
     __javainterfaces__ = (
         "com.google.android.gms.ads.OnPaidEventListener",
         "com.google.android.gms.ads.OnUserEarnedRewardListener",
-        "com.pygameadmob.pygameadmobFullScreenContentCallbackInterface",
-        "com.pygameadmob.pygameadmobRewardedAdLoadCallbackInterface", 
+        "com.simpleam.simpleamFullScreenContentCallbackInterface",
+        "com.simpleam.simpleamRewardedAdLoadCallbackInterface", 
     )
     __javacontext__ = "app"
     def __init__(self, ad_id: str = TEST_REWARDED_ID):

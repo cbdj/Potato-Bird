@@ -1,11 +1,11 @@
-package com.pygameadmob;
-import com.pygameadmob.pygameadmobAdListenerInterface;
+package com.simpleam;
+import com.simpleam.simpleamAdListenerInterface;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.LoadAdError;
 
-public class pygameadmobAdListener extends AdListener{
-	pygameadmobAdListenerInterface python_callbacks;
-	public pygameadmobAdListener(pygameadmobAdListenerInterface my_interface){
+public class simpleamAdListener extends AdListener{
+	simpleamAdListenerInterface python_callbacks;
+	public simpleamAdListener(simpleamAdListenerInterface my_interface){
 		python_callbacks = my_interface;
 	}
     @Override

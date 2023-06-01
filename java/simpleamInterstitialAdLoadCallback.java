@@ -1,12 +1,12 @@
-package com.pygameadmob;
-import com.pygameadmob.pygameadmobInterstitialAdLoadCallbackInterface;
+package com.simpleam;
+import com.simpleam.simpleamInterstitialAdLoadCallbackInterface;
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.interstitial.InterstitialAd;
 
-public class pygameadmobInterstitialAdLoadCallback extends InterstitialAdLoadCallback{
-	pygameadmobInterstitialAdLoadCallbackInterface python_callbacks;
-	public pygameadmobInterstitialAdLoadCallback(pygameadmobInterstitialAdLoadCallbackInterface my_interface){
+public class simpleamInterstitialAdLoadCallback extends InterstitialAdLoadCallback{
+	simpleamInterstitialAdLoadCallbackInterface python_callbacks;
+	public simpleamInterstitialAdLoadCallback(simpleamInterstitialAdLoadCallbackInterface my_interface){
 		python_callbacks = my_interface;
 	}
     @Override

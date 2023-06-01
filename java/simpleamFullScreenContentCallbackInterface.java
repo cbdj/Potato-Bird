@@ -1,7 +1,7 @@
-package com.pygameadmob;
+package com.simpleam;
 import com.google.android.gms.ads.AdError;
 
-public interface pygameadmobFullScreenContentCallbackInterface {
+public interface simpleamFullScreenContentCallbackInterface {
     public void onAdClicked ();
     public void onAdDismissedFullScreenContent();
     public void onAdFailedToShowFullScreenContent(AdError adError);

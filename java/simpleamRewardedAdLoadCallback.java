@@ -1,12 +1,12 @@
-package com.pygameadmob;
-import com.pygameadmob.pygameadmobRewardedAdLoadCallbackInterface;
+package com.simpleam;
+import com.simpleam.simpleamRewardedAdLoadCallbackInterface;
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.rewarded.RewardedAd;
 
-public class pygameadmobRewardedAdLoadCallback extends RewardedAdLoadCallback{
-	pygameadmobRewardedAdLoadCallbackInterface python_callbacks;
-	public pygameadmobRewardedAdLoadCallback(pygameadmobRewardedAdLoadCallbackInterface my_interface){
+public class simpleamRewardedAdLoadCallback extends RewardedAdLoadCallback{
+	simpleamRewardedAdLoadCallbackInterface python_callbacks;
+	public simpleamRewardedAdLoadCallback(simpleamRewardedAdLoadCallbackInterface my_interface){
 		python_callbacks = my_interface;
 	}
     @Override
