@@ -8,7 +8,7 @@ class AdManager():
         self.banner = pygameadmob.Banner(Settings.BANNER_ID, "BOTTOM", "BANNER")
         self.banner.load_ad()
         self.banner.set_visibility(True)
-        self.ad = pygameadmob.Rewarded()
+        # self.ad = pygameadmob.Rewarded()
         self.timeout = False
         self.loaded = False
         self.showed = True
