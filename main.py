@@ -1,5 +1,6 @@
 import sys
 import os     
+os.environ['SDL_HINT_RENDER_SCALE_QUALITY'] = '1'
 sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 import Settings
 from SpriteHandler import SpriteHandler
@@ -8,14 +9,14 @@ import pygame as pg
 from pygame._sdl2.video import Window, Renderer, Texture, Image
 import Exfont    
 
-__version__ = "1.0.0"
+__version__ = "1.0.2"
 
 class App:
     def __init__(self):
         pg.init()
         pg.mixer.init()
         screen_info = pg.display.Info()
-        self.window = Window(title='flap.py', size=(screen_info.current_w,screen_info.current_h))
+        self.window = Window(title='flap.py', size=(screen_info.current_w,screen_info.current_h), fullscreen=True)
         self.window.set_icon(pg.image.load(os.path.join(Settings.ASSETS_DIR_PATH,'favicon.png')))
         self.renderer = Renderer(self.window)
         self.sprite_handler = SpriteHandler(self)
@@ -30,7 +31,7 @@ class App:
         
         if Settings.platform=='android':
             from AdManager import AdManager 
-            self.ad_manager = AdManager(Settings.AD_ID)
+            self.ad_manager = AdManager()
 
     def update(self):
         self.sprite_handler.update()

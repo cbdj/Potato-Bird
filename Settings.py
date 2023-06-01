@@ -19,9 +19,11 @@ if platform=="android":
     base_path=os.path.abspath("/data/data/com.cldejessey.flappy/files/app/")
     debug=True
     if debug:
-        AD_ID="ca-app-pub-3940256099942544/8691691433"
+        INTERSTITIAL_ID="ca-app-pub-3940256099942544/8691691433"
+        BANNER_ID="ca-app-pub-3940256099942544/6300978111"
     else:
-        AD_ID="ca-app-pub-4493613666001226/1483234688"
+        INTERSTITIAL_ID="ca-app-pub-4493613666001226/1483234688"
+        BANNER_ID="ca-app-pub-4493613666001226/5140290547"
         
 elif platform=="win":
     try:

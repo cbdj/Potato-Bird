@@ -1,6 +1,5 @@
 from jnius import autoclass, PythonJavaClass, JavaClass, java_method
 from android.runnable import run_on_ui_thread
-from time import sleep
 
 TEST_BANNER_ID = "ca-app-pub-3940256099942544/6300978111"
 TEST_INTERSTITIAL_ID = "ca-app-pub-3940256099942544/1033173712"
@@ -253,8 +252,8 @@ class Rewarded(AdObject, PythonJavaClass):
         """
         super().__init__(ad_id)
         self._full_screen_content_callback = FullScreenContentCallbacks()
-        self._on_user_earned_reward_listener = OnUserEarnedRewardCallbacks()
-        self._on_paid_event_listener = PaidEventCallbacks()   
+        self._user_earned_reward_listener = OnUserEarnedRewardCallbacks()
+        self._paid_event_listener = PaidEventCallbacks()   
 
     @java_method("(Lcom/google/android/gms/ads/AdValue;)V")
     def onPaidEvent(self, value):
@@ -298,10 +297,10 @@ class Rewarded(AdObject, PythonJavaClass):
         self._full_screen_content_callback = callbacks
         
     def set_OnUserEarnedRewardListener(self, callback: OnUserEarnedRewardCallbacks):
-        self._on_user_earned_reward_listener = callback
+        self._user_earned_reward_listener = callback
         
     def set_OnPaidEventListener(self, callback: PaidEventCallbacks):
-        self._on_paid_event_listener = callback
+        self._paid_event_listener = callback
         
     @run_on_ui_thread
     def load_ad(self, filters: dict = {}) -> None:

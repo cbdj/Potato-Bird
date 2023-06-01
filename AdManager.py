@@ -2,12 +2,13 @@ import pygameadmob
 import pygame as pg
 import Settings
 class AdManager():
-    def __init__(self, ad_id : str):
+    def __init__(self):
         pygameadmob.pygameadmob_init()
-        self.ad = pygameadmob.Interstitial(ad_id)
-        # self.banner = pygameadmob.Banner(pygameadmob.TEST_BANNER_ID, "TOP")
-        # self.banner.load_ad()
-        # self.ad = pygameadmob.Rewarded()
+        self.ad = pygameadmob.Interstitial(Settings.INTERSTITIAL_ID)
+        self.banner = pygameadmob.Banner(Settings.BANNER_ID, "BOTTOM", "BANNER")
+        self.banner.load_ad()
+        self.banner.set_visibility(True)
+        self.ad = pygameadmob.Rewarded()
         self.timeout = False
         self.loaded = False
         self.showed = True
@@ -34,6 +35,7 @@ class AdManager():
                 self.showed = False
                 pg.time.set_timer(Settings.EVENT_AD, Settings.AD_TIME_MS)
                 self.timeout = False
+                self.banner.load_ad()
         
     def on_timeout(self):
         print('AdManager : timeout')
