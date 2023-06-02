@@ -16,7 +16,7 @@ def get_platform():
 platform = get_platform()
 
 if platform=="android":
-    base_path=os.path.abspath("/data/data/com.cldejessey.flappy/files/app/")
+    base_path=os.path.abspath("/data/data/com.cldejessey.potatobird/files/app/")
     debug=True
     if debug:
         INTERSTITIAL_ID="ca-app-pub-3940256099942544/8691691433"

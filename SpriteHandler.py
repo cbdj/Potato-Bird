@@ -119,7 +119,7 @@ class SpriteHandler:
             # create 'gameover' asset
             images['gameover'] = Exfont.text_speech(font, 'GAME OVER', 'orange', True, 2, 'white')
             # create 'message' asset
-            flap_py = Exfont.text_speech(font, 'FLAP.PY', 'white', True, 2, 'black')
+            flap_py = Exfont.text_speech(font, 'Potato Bird', 'white', True, 2, 'black')
             get_ready = Exfont.text_speech(font, 'GET READY!', 'green', True, 2, 'black')
             def grayscale(surface : pg.Surface):
                 ret = surface.copy()

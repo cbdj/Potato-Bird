@@ -1,10 +1,10 @@
 [app]
 
 # (str) Title of your application
-title = Flap.py
+title = Potato Bird
 
 # (str) Package name
-package.name = flappy
+package.name = potatobird
 
 # (str) Package domain (needed for android/ios packaging)
 package.domain = com.cldejessey
