@@ -25,7 +25,7 @@ class SpriteHandler:
         screen_info = pg.display.Info()
         scale_w= screen_info.current_w/Settings.WIN_W
         scale_h= screen_info.current_h/Settings.WIN_H
-        self.scale = min(scale_w, scale_h)
+        self.scale = scale_h
         Settings.WIN_W = float(Settings.WIN_W)*float(screen_info.current_w)//(float(Settings.WIN_W)*self.scale)
         self.extend_world(Settings.WIN_W)
 
