@@ -4,7 +4,7 @@
 title = Potato Bird
 
 # (str) Package name
-package.name = potatobird
+package.name = flappy
 
 # (str) Package domain (needed for android/ios packaging)
 package.domain = com.cldejessey
@@ -74,7 +74,7 @@ osx.kivy_version = 1.9.1
 #
 
 # (bool) Indicate if the application should be fullscreen or not
-#fullscreen = 0
+fullscreen = 1
 
 # (string) Presplash background color (for android toolchain)
 # Supported formats are: #RRGGBB #AARRGGBB or one of the following names:
