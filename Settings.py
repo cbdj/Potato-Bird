@@ -16,15 +16,13 @@ def get_platform():
 platform = get_platform()
 
 if platform=="android":
-    base_path=os.path.abspath("/data/data/com.cldejessey.flappy/files/app/")
-    debug=False
-    if debug:
-        INTERSTITIAL_ID="ca-app-pub-3940256099942544/8691691433"
-        BANNER_ID="ca-app-pub-3940256099942544/6300978111"
-    else:
-        INTERSTITIAL_ID="ca-app-pub-4493613666001226/1483234688"
-        BANNER_ID="ca-app-pub-4493613666001226/5140290547"
-        
+    package_domain="com.cldejessey"
+    package_name="flappy"
+    base_path=os.path.abspath(f"/data/data/{package_domain}.{package_name}/files/app/")
+    INTERSTITIAL_ID="ca-app-pub-4493613666001226/1483234688"
+    BANNER_ID="ca-app-pub-4493613666001226/5140290547"
+    LEADERBOARD_ID="CgkIzdaAt-geEAIQAQ"
+    
 elif platform=="win":
     try:
     # PyInstaller creates a temp folder and stores path in _MEIPASS

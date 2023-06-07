@@ -202,7 +202,7 @@ android.add_src = java
 #android.add_resources =
 
 # (list) Gradle dependencies to add
-android.gradle_dependencies = com.google.android.gms:play-services-ads:22.1.0,com.google.gms:google-services:4.3.15,androidx.work:work-runtime:2.7.1
+android.gradle_dependencies = com.google.android.gms:play-services-ads:22.1.0,com.google.gms:google-services:4.3.15,androidx.work:work-runtime:2.7.1,com.google.android.gms:play-services-games-v2:17.0.0,com.google.android.gms:play-services-tasks:18.0.2
 
 # (bool) Enable AndroidX support. Enable when 'android.gradle_dependencies'
 # contains an 'androidx' package, or any package from Kotlin source.
@@ -217,7 +217,7 @@ android.gradle_dependencies = com.google.android.gms:play-services-ads:22.1.0,co
 # (list) Gradle repositories to add {can be necessary for some android.gradle_dependencies}
 # please enclose in double quotes 
 # e.g. android.gradle_repositories = "maven { url 'https://kotlin.bintray.com/ktor' }"
-#android.add_gradle_repositories =
+#android.add_gradle_repositories ="mavenCentral","google"
 
 # (list) packaging options to add 
 # see https://google.github.io/android-gradle-dsl/current/com.android.build.gradle.internal.dsl.PackagingOptions.html
@@ -261,7 +261,7 @@ android.gradle_dependencies = com.google.android.gms:play-services-ads:22.1.0,co
 #android.wakelock = False
 
 # (list) Android application meta-data to set (key=value format)
-android.meta_data = com.google.android.gms.ads.APPLICATION_ID=ca-app-pub-4493613666001226~6265304991
+android.meta_data = com.google.android.gms.ads.APPLICATION_ID=ca-app-pub-4493613666001226~6265304991,com.google.android.gms.games.APP_ID=\u0031058824792909
 # Use ca-app-pub-3940256099942544~3347511713 for tests
 
 # (list) Android library project to add (will be added in the

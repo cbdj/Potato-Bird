@@ -260,8 +260,12 @@ class SpriteHandler:
         self.score.save_best()
         self.stop()
         if Settings.platform=='android':
-            # get punished
-            self.app.ad_manager.may_show()
+            if self.score.score == self.score.best:
+                self.app.playgamesservices.submit_score(self.score.best)
+                self.app.playgamesservices.show_leaderboard()
+            else:
+                # get punished
+                self.app.ad_manager.may_show()
 
     def quit(self):
         self.score.save_best()
