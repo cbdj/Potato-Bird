@@ -39,7 +39,7 @@ WIN_H = 0
 
 # CONSTANTS
 TITLE = 'Potato Bird'
-FULLSCREEN=False
+FULLSCREEN= platform == "android"
 USE_OFFICIAL_ASSETS = False
 if USE_OFFICIAL_ASSETS : 
     ASSETS_DIR_PATH = os.path.join(base_path,'official_assets')

@@ -49,13 +49,15 @@ class SpriteHandler:
         if Settings.USE_OFFICIAL_ASSETS:
             self.menu = SpriteUnit(self, self.images['message'], Settings.WIN_W / 2, Settings.WIN_H / 2)
         else:
-            self.menu = Menu(self,self.images, Settings.WIN_W / 2, Settings.WIN_H / 2, Settings.TITLE, self.images[Settings.BIRD_COLOR + 'bird-midflap'], Settings.FONT_SIZE)
+            self.menu = Menu(self, Settings.WIN_W / 2, Settings.WIN_H / 2, Settings.TITLE, self.images[Settings.BIRD_COLOR + 'bird-midflap'], Settings.FONT_SIZE)
         def callback():
             if Settings.platform == 'android':
-                self.app.playgamesservices.show_leaderboard
+                self.app.playgamesservices.show_leaderboard()
         self.leaderboard_button = Button(self, self.images['leaderboard_button'], self.images['leaderboard_button_pressed'], Settings.WIN_W / 2, 2*Settings.WIN_H /3, callback)
         self._gameover = SpriteUnit(self,self.images['gameover'], Settings.WIN_W / 2, Settings.WIN_H / 2)
-        self.score=Score(self,self.images, Settings.WIN_W / 2, 2*Settings.FONT_SIZE, Settings.FONT_SIZE)
+        self.score=Score(self, Settings.WIN_W / 2, 2*Settings.FONT_SIZE, Settings.FONT_SIZE)
+        if Settings.platform == 'android':
+            self.app.playgamesservices.get_remote_best(self.score.set_best)
 
         # Creating groups
         self.group_background = pg.sprite.GroupSingle(self.background)
@@ -77,7 +79,6 @@ class SpriteHandler:
         self._paused = False
         self.background.reset()
         self.score.reset()
-        self.score.display_best()
         self.bird.reset()
         for pipe, pipe_reversed in self.pipes:
             pipe.reset()
@@ -197,7 +198,6 @@ class SpriteHandler:
         if mouse_button[0]:
             x, y = pg.mouse.get_pos()
             x,y = x/self.scale, y/self.scale
-            print(f"{self.leaderboard_button.rect} vs ({x},{y})")
             if self.leaderboard_button.alive() and self.leaderboard_button.rect.collidepoint((x, y)):
                 self.leaderboard_button.press()
             else:

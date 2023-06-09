@@ -178,7 +178,7 @@ android.ndk = 25b
 
 # (list) List of Java files to add to the android project (can be java or a
 # directory containing the files)
-android.add_src = java 
+android.add_src = Android/java 
 
 # (list) Android AAR archives to add
 #android.add_aars =

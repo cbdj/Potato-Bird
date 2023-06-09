@@ -9,6 +9,7 @@ class JavaBridge:
     OnCompleteListener_AuthenticationResult = autoclass("com.cldejessey.OnCompleteListener_AuthenticationResult")
     OnCompleteListener_String = autoclass("com.cldejessey.OnCompleteListener_String")
     OnCompleteListener_Player = autoclass("com.cldejessey.OnCompleteListener_Player")
+    LeaderboardVariant = autoclass("com.google.android.gms.games.leaderboard.LeaderboardVariant")
     
 class OnCompleteListener_String(PythonJavaClass):
     " AdMob banner ad class. "
@@ -68,6 +69,7 @@ class PlayGamesServices():
         self.signed = False
         self.player = None
         self.leaderboard_id = leaderboard_id
+        self.on_fetched_best = None
         
     @run_on_ui_thread
     def _on_signin_complete(self, result):
@@ -82,10 +84,20 @@ class PlayGamesServices():
             print("PlayGamesServices : Successful GooglePlay signin")
             
     @run_on_ui_thread
-    def _on_show_leaderboard_complete(self, intent):
-        print(f"PlayGamesServices : Beforre Showing LeaderBoard")
-        self.activity.startActivityForResult(intent, 9004);
+    def _on_show_leaderboard_success(self, intent):
         print(f"PlayGamesServices : Showing LeaderBoard")
+        self.activity.startActivityForResult(intent, 9004);
+        
+    @run_on_ui_thread
+    def _on_get_remote_best_success(self, leaderboardScoreAnnotatedData):
+        print(f"PlayGamesServices : _on_get_remote_best_complete")
+        scoresResult =  leaderboardScoreAnnotatedData.get()
+        scoreResult = scoresResult.getScores().get(0) if scoresResult is not None else None
+        if scoreResult is not None:
+            remote_best = scoreResult.getRawScore()
+            print(f"PlayGamesServices : Fetched remote best : {remote_best}")
+            self.on_fetched_best(remote_best)
+        leaderboardScoreAnnotatedData = None
      
     def _set_player(self, player):
         self.player = player
@@ -99,4 +111,11 @@ class PlayGamesServices():
     @run_on_ui_thread
     def show_leaderboard(self):
         print(f"PlayGamesServices : Queuing Showing LeaderBoard")
-        JavaBridge.PlayGames.getLeaderboardsClient(self.activity).getLeaderboardIntent(self.leaderboard_id).addOnSuccessListener(OnSuccessListener(self._on_show_leaderboard_complete) )
+        JavaBridge.PlayGames.getLeaderboardsClient(self.activity).getLeaderboardIntent(self.leaderboard_id).addOnSuccessListener(OnSuccessListener(self._on_show_leaderboard_success) )
+
+    @run_on_ui_thread
+    def get_remote_best(self, callback):
+        print(f"PlayGamesServices : Queuing Get Remote Best")
+        self.on_fetched_best = callback
+        leaderboards_client = JavaBridge.PlayGames.getLeaderboardsClient(self.activity).loadPlayerCenteredScores(self.leaderboard_id, JavaBridge.LeaderboardVariant.TIME_SPAN_ALL_TIME, JavaBridge.LeaderboardVariant.COLLECTION_PUBLIC, 1)
+        leaderboards_client.addOnSuccessListener(OnSuccessListener(self._on_get_remote_best_success))

@@ -5,8 +5,7 @@ from pygame._sdl2 import Image, Texture
 from .SpriteUnit import SpriteUnit
 
 class Score(SpriteUnit):
-    def __init__(self, handler, images, x, y, font_size):
-        self.images=images
+    def __init__(self, handler, x, y, font_size):
         self.best=0
         self.score=0
         self.font_size = font_size
@@ -20,26 +19,30 @@ class Score(SpriteUnit):
         if os.path.exists(self.score_path):
             with open(self.score_path,'r') as score_file:
                 self.best=int(score_file.read())
-        super().__init__(handler, self.get_score_surface(self.best),x,y)
-
-    def display_best(self):
-        self.score=0
-        self.update_image(Image(Texture.from_surface(self.handler.renderer, self.get_score_surface(0))))
+        super().__init__(handler, self.get_surface(),x,y)
+        
+    def set_best(self, best):
+        self.best = best
+        self.update_slow()
+    
+    def update_slow(self):
+        self.update_image(Image(Texture.from_surface(self.handler.renderer, self.get_surface())))
 
     def reset(self):
         super().reset()
         self.score=0
-        self.update_image(Image(Texture.from_surface(self.handler.renderer, self.get_score_surface(self.score))))
+        self.update_slow()
 
     def increment(self, points=1):
         self.score += points
         if self.score > self.best:
             self.best = self.score
-        self.update_image(Image(Texture.from_surface(self.handler.renderer, self.get_score_surface(self.score))))
+        self.update_slow()
     
     def save_best(self):
             with open(self.score_path,'w') as score_file:
                 score_file.write(str(self.best))
 
-    def get_score_surface(self, score : int):
-        return pg.font.SysFont(None, self.font_size).render( f'Best : {self.best}  Score : {score}', True, 'white')
+    def get_surface(self):
+        surface = pg.font.SysFont(None, self.font_size).render( f'Best : {self.best}  Score : {self.score}', True, 'white')
+        return surface

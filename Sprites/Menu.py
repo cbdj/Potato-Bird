@@ -8,8 +8,8 @@ import Exfont
 import pygame.gfxdraw as gfx
 
 class Menu(SpriteUnit):
-    def __init__(self, handler, images, x, y, title : str, bird : Surface, font_size : int):
-        surface = pg.Surface((x,y), pg.SRCALPHA)
+    def __init__(self, handler, x, y, title : str, bird : Surface, font_size : int):
+        surface = pg.Surface((2*x,2*y), pg.SRCALPHA)
         font = pg.font.SysFont(None, font_size)
         half_font = pg.font.SysFont(None, font_size//2)
         title = Exfont.text_speech(font, title, 'white', True, 2, 'black')
