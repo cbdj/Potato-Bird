@@ -1,17 +1,16 @@
 import Settings
-import numpy as np
-from Background import Background
-from Base import Base
-from Pipe import Pipe
-from Bird import Bird
-from Score import Score
+from Sprites.Background import Background
+from Sprites.Base import Base
+from Sprites.Pipe import Pipe
+from Sprites.Bird import Bird
+from Sprites.Score import Score
+from Sprites.Menu import Menu
+from Sprites.Button import Button
+from Sprites.SpriteUnit import SpriteUnit
 import pygame as pg
-from pygame._sdl2.video import Image, Texture
 import pathlib
 from random import randrange, uniform
-from SpriteUnit import SpriteUnit
 import Exfont
-import pygame.gfxdraw as gfx
 
 class SpriteHandler:
     def __init__(self, app):
@@ -23,9 +22,7 @@ class SpriteHandler:
         # Adapting dimensions to screen resolution
         Settings.WIN_W, Settings.WIN_H = self.compute_size()
         screen_info = pg.display.Info()
-        scale_w= screen_info.current_w/Settings.WIN_W
-        scale_h= screen_info.current_h/Settings.WIN_H
-        self.scale = scale_h
+        self.scale = screen_info.current_h/Settings.WIN_H
         Settings.WIN_W = float(Settings.WIN_W)*float(screen_info.current_w)//(float(Settings.WIN_W)*self.scale)
         self.extend_world(Settings.WIN_W)
 
@@ -45,12 +42,20 @@ class SpriteHandler:
         self.base=Base(self, self.images['base'], self.images['base'].get_width()/2, Settings.WIN_H-self.images['base'].get_height()/2)
 
         # Creating Bird sprite
-        self.bird = Bird(self, self.images[Settings.BIRD_COLOR + 'bird-downflap'], self.images[Settings.BIRD_COLOR + 'bird-midflap'], self.images[Settings.BIRD_COLOR + 'bird-upflap'], Settings.WIN_W // 2, Settings.WIN_H // 2)
+        self.bird = Bird(self, self.images[Settings.BIRD_COLOR + 'bird-downflap'], self.images[Settings.BIRD_COLOR + 'bird-midflap'], self.images[Settings.BIRD_COLOR + 'bird-upflap'], Settings.WIN_W // 2, Settings.WIN_H // 2, Settings.BUMP_SPEED, Settings.BIRD_MASS_KG)
 
         # Creating menu
-        self.menu = SpriteUnit(self,self.images['message'], Settings.WIN_W / 2, Settings.WIN_H / 2)
+        
+        if Settings.USE_OFFICIAL_ASSETS:
+            self.menu = SpriteUnit(self, self.images['message'], Settings.WIN_W / 2, Settings.WIN_H / 2)
+        else:
+            self.menu = Menu(self,self.images, Settings.WIN_W / 2, Settings.WIN_H / 2, Settings.TITLE, self.images[Settings.BIRD_COLOR + 'bird-midflap'], Settings.FONT_SIZE)
+        def callback():
+            if Settings.platform == 'android':
+                self.app.playgamesservices.show_leaderboard
+        self.leaderboard_button = Button(self, self.images['leaderboard_button'], self.images['leaderboard_button_pressed'], Settings.WIN_W / 2, 2*Settings.WIN_H /3, callback)
         self._gameover = SpriteUnit(self,self.images['gameover'], Settings.WIN_W / 2, Settings.WIN_H / 2)
-        self.score=Score(self,self.images, Settings.WIN_W / 2, 2*Settings.FONT_SIZE)
+        self.score=Score(self,self.images, Settings.WIN_W / 2, 2*Settings.FONT_SIZE, Settings.FONT_SIZE)
 
         # Creating groups
         self.group_background = pg.sprite.GroupSingle(self.background)
@@ -79,6 +84,8 @@ class SpriteHandler:
             pipe_reversed.reset()
         self.group_foreground.empty()
         self.group_foreground.add(self.menu, self.score)
+        if Settings.platform == 'android':
+            self.group_foreground.add(self.leaderboard_button)
         self.update_speed(0)
         self.app.dt=0.0
         self.group_background.update()
@@ -115,38 +122,9 @@ class SpriteHandler:
         #
         if not Settings.USE_OFFICIAL_ASSETS :
             font = pg.font.SysFont(None, Settings.FONT_SIZE)
-            half_font = pg.font.SysFont(None, Settings.FONT_SIZE//2)
             # create 'gameover' asset
             images['gameover'] = Exfont.text_speech(font, 'GAME OVER', 'orange', True, 2, 'white')
             # create 'message' asset
-            flap_py = Exfont.text_speech(font, 'Potato Bird', 'white', True, 2, 'black')
-            get_ready = Exfont.text_speech(font, 'GET READY!', 'green', True, 2, 'black')
-            def grayscale(surface : pg.Surface):
-                ret = surface.copy()
-                for x in range(surface.get_width()):
-                    for y in range(surface.get_height()):
-                        pixel: pg.Color = surface.get_at((x, y))
-                        grey_pixel = 0.299 * pixel.r + 0.587 * pixel.g + 0.114 * pixel.b
-                        ret.set_at((x,y), (grey_pixel, grey_pixel, grey_pixel, pixel.a))
-                return ret
-            grey_bird = grayscale(images[Settings.BIRD_COLOR + 'bird-midflap'])
-            tap = Exfont.text_speech(half_font, 'TAP!', 'white', True, 1, 'black')
-            images['message'] = pg.Surface((images['background-day'].get_width(),images['background-day'].get_height()), pg.SRCALPHA)
-            index_w = index_w_bird = images['message'].get_width()//2-grey_bird.get_width()//2
-            index_h = index_h_bird = images['message'].get_height()//2 - grey_bird.get_height()//2
-            images['message'].blit(grey_bird, (index_w, index_h))
-            index_w = images['message'].get_width()//2-get_ready.get_width()//2
-            index_h -= 2*get_ready.get_height()
-            images['message'].blit(get_ready, (index_w, index_h))
-            index_w = images['message'].get_width()//2-flap_py.get_width()//2
-            index_h -= 2*flap_py.get_height()
-            images['message'].blit(flap_py, (index_w, index_h))
-            gfx.box(images['message'], (index_w_bird - 2*grey_bird.get_width(), index_h_bird, grey_bird.get_width(), grey_bird.get_height()), (255,0,0))
-            gfx.box(images['message'], (index_w_bird + 2*grey_bird.get_width(), index_h_bird, grey_bird.get_width(), grey_bird.get_height()), (255,0,0))
-            gfx.filled_trigon(images['message'],index_w_bird - grey_bird.get_width(), index_h_bird, index_w_bird, index_h_bird + grey_bird.get_height()//2,index_w_bird - grey_bird.get_width(), index_h_bird +2*grey_bird.get_height()//2, (255,0,0))
-            gfx.filled_trigon(images['message'],index_w_bird + 2*grey_bird.get_width(), index_h_bird, index_w_bird + grey_bird.get_width(), index_h_bird + grey_bird.get_height()//2,index_w_bird + 2*grey_bird.get_width(), index_h_bird +2*grey_bird.get_height()//2, (255,0,0))
-            images['message'].blit(tap, (index_w_bird - 3*grey_bird.get_width()/2, index_h_bird+grey_bird.get_height()/4))
-            images['message'].blit(tap, (index_w_bird + 3*grey_bird.get_width()/2, index_h_bird+grey_bird.get_height()/4))
         return images
     
     def extend_world(self, new_width):
@@ -169,7 +147,6 @@ class SpriteHandler:
 
 
     def maybe_requeue_pipes(self):
-
         def pipe_requeue(pipe, pipe_reversed):
             """ 
             Reque pipes 
@@ -219,9 +196,19 @@ class SpriteHandler:
         mouse_button = pg.mouse.get_pressed()
         if mouse_button[0]:
             x, y = pg.mouse.get_pos()
-            self.on_action()
+            x,y = x/self.scale, y/self.scale
+            print(f"{self.leaderboard_button.rect} vs ({x},{y})")
+            if self.leaderboard_button.alive() and self.leaderboard_button.rect.collidepoint((x, y)):
+                self.leaderboard_button.press()
+            else:
+                self.on_action()
         elif mouse_button[2]:
             pass
+            
+    def on_mouse_unpress(self):
+        mouse_button = pg.mouse.get_pressed()
+        if not mouse_button[0] and self.leaderboard_button.pressed:
+            self.leaderboard_button.unpress()
 
     def on_key_press(self, key):
         if key == pg.K_SPACE:
@@ -262,7 +249,6 @@ class SpriteHandler:
         if Settings.platform=='android':
             if self.score.score == self.score.best:
                 self.app.playgamesservices.submit_score(self.score.best)
-                self.app.playgamesservices.show_leaderboard()
             else:
                 # get punished
                 self.app.ad_manager.may_show()

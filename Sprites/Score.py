@@ -2,14 +2,14 @@
 import pygame as pg
 import os
 from pygame._sdl2 import Image, Texture
-from SpriteUnit import SpriteUnit
-import Settings
+from .SpriteUnit import SpriteUnit
 
 class Score(SpriteUnit):
-    def __init__(self, handler, images, x, y):
+    def __init__(self, handler, images, x, y, font_size):
         self.images=images
         self.best=0
         self.score=0
+        self.font_size = font_size
         path = '.'
         try :
             path = pg.system.get_pref_path()
@@ -42,4 +42,4 @@ class Score(SpriteUnit):
                 score_file.write(str(self.best))
 
     def get_score_surface(self, score : int):
-        return pg.font.SysFont(None, Settings.FONT_SIZE).render( f'Best : {self.best}  Score : {score}', True, 'white')
+        return pg.font.SysFont(None, self.font_size).render( f'Best : {self.best}  Score : {score}', True, 'white')

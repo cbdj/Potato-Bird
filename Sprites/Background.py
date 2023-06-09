@@ -1,4 +1,4 @@
-from Base import Base
+from .Base import Base
 from pygame._sdl2 import Image, Texture
 
 class Background(Base):

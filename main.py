@@ -17,12 +17,12 @@ class App:
         pg.init()
         if Settings.platform=='android':
             from AdManager import AdManager 
-            from PlayGamesServices import PlayGamesServices
+            from Android.PlayGamesServices import PlayGamesServices
             self.ad_manager = AdManager()
-            self.playgamesservices = PlayGamesServices()
+            self.playgamesservices = PlayGamesServices(Settings.LEADERBOARD_ID)
         pg.mixer.init()
         screen_info = pg.display.Info()
-        self.window = Window(title='flap.py', size=(screen_info.current_w,screen_info.current_h), fullscreen=True)
+        self.window = Window(title='flap.py', size=(screen_info.current_w,screen_info.current_h), fullscreen=Settings.FULLSCREEN)
         self.window.set_icon(pg.image.load(os.path.join(Settings.ASSETS_DIR_PATH,'favicon.png')))
         self.renderer = Renderer(self.window)
         self.sprite_handler = SpriteHandler(self)
@@ -58,6 +58,8 @@ class App:
                 self.running = False
             elif e.type == pg.MOUSEBUTTONDOWN:
                 self.sprite_handler.on_mouse_press()
+            elif e.type == pg.MOUSEBUTTONUP:
+                self.sprite_handler.on_mouse_unpress()
             elif e.type == pg.KEYDOWN:
                 if e.key == pg.K_ESCAPE:
                     self.running = False
@@ -68,7 +70,7 @@ class App:
             elif e.type == Settings.EVENT_DAY_NIGHT:
                 if self.sprite_handler._started and not self.sprite_handler._paused: 
                     self.sprite_handler.background.toggle_day_night()
-                    self.speed = Settings.SPEED_INCREASE_FACTOR*self.speed
+                    self.speed += Settings.SPEED_INCREASE_FACTOR
                     self.sprite_handler.update_speed(self.speed)
                     self.sprite_handler.sounds['swoosh'].play()
             elif e.type == Settings.EVENT_AD:

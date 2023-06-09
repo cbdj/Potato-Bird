@@ -1,4 +1,4 @@
-import simpleam
+import Android.simpleam as simpleam
 import pygame as pg
 import Settings
 class AdManager():

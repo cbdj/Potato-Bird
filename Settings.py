@@ -38,6 +38,8 @@ WIN_W = 0
 WIN_H = 0
 
 # CONSTANTS
+TITLE = 'Potato Bird'
+FULLSCREEN=False
 USE_OFFICIAL_ASSETS = False
 if USE_OFFICIAL_ASSETS : 
     ASSETS_DIR_PATH = os.path.join(base_path,'official_assets')
@@ -49,8 +51,8 @@ BIRD_COLOR = 'yellow'
 PIPE_DENSITY = 6
 BUMP_SPEED = 300
 FONT_SIZE = 40
-SPEED = 100 # initial pipe and base speed
-SPEED_INCREASE_FACTOR = 1.1 # speed increase at each day/night event
+SPEED = 120 # initial pipe and base speed
+SPEED_INCREASE_FACTOR = 20 # speed increase at each day/night event
 DAY_NIGHT_TIME_MS = 10000
 EVENT_DAY_NIGHT = pg.USEREVENT+1
 BIRD_MASS_KG = 0.1
