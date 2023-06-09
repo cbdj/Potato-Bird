@@ -57,7 +57,7 @@ class SpriteHandler:
         self._gameover = SpriteUnit(self,self.images['gameover'], Settings.WIN_W / 2, Settings.WIN_H / 2)
         self.score=Score(self, Settings.WIN_W / 2, 2*Settings.FONT_SIZE, Settings.FONT_SIZE)
         if Settings.platform == 'android':
-            self.app.playgamesservices.get_remote_best(self.score.set_best)
+            self.app.playgamesservices.get_remote_best(self.score.set_remote_best)
 
         # Creating groups
         self.group_background = pg.sprite.GroupSingle(self.background)

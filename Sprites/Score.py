@@ -7,6 +7,7 @@ from .SpriteUnit import SpriteUnit
 class Score(SpriteUnit):
     def __init__(self, handler, x, y, font_size):
         self.best=0
+        self.remote_best=0
         self.score=0
         self.font_size = font_size
         path = '.'
@@ -21,10 +22,15 @@ class Score(SpriteUnit):
                 self.best=int(score_file.read())
         super().__init__(handler, self.get_surface(),x,y)
         
-    def set_best(self, best):
-        self.best = best
-        self.update_slow()
-    
+    def set_remote_best(self, best):
+        self.remote_best = best
+        
+    def update(self):
+        if self.remote_best > self.best:
+            self.best = self.remote_best
+            self.update_slow()
+        super().update()
+        
     def update_slow(self):
         self.update_image(Image(Texture.from_surface(self.handler.renderer, self.get_surface())))
 
