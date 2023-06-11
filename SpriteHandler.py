@@ -7,6 +7,7 @@ from Sprites.Score import Score
 from Sprites.Menu import Menu
 from Sprites.Button import Button
 from Sprites.SpriteUnit import SpriteUnit
+from Particles.Smoke import Smoke
 import pygame as pg
 import pathlib
 from random import randrange, uniform
@@ -16,7 +17,8 @@ class SpriteHandler:
     def __init__(self, app):
         self.app = app
         self.renderer = self.app.renderer
-        self.images = self.load_images() # load textures from *.jpg
+        self.images = self.load_png(Settings.SPRITE_DIR_PATH)
+        self.particles = self.load_png(Settings.PARTICLES_DIR_PATH)
         self.sounds = self.load_sounds()
 
         # Adapting dimensions to screen resolution
@@ -43,7 +45,7 @@ class SpriteHandler:
 
         # Creating Bird sprite
         self.bird = Bird(self, self.images[Settings.BIRD_COLOR + 'bird-downflap'], self.images[Settings.BIRD_COLOR + 'bird-midflap'], self.images[Settings.BIRD_COLOR + 'bird-upflap'], Settings.WIN_W // 2, Settings.WIN_H // 2, Settings.BUMP_SPEED, Settings.BIRD_MASS_KG)
-
+        self.smoke = Smoke(self.renderer, self.particles['smoke'],self.bird.x,self.bird.y)
         # Creating menu
         
         if Settings.USE_OFFICIAL_ASSETS:
@@ -112,12 +114,12 @@ class SpriteHandler:
         h = self.images['background-day'].get_height() + self.images['base'].get_height()
         return w,h
     
-    def load_images(self):
+    def load_png(self, path):
         """ from .png to pygame Surfaces """
         # loading .png images
-        images = dict([(path.stem, pg.image.load(str(path))) for path in pathlib.Path(Settings.SPRITE_DIR_PATH).rglob('*.png') if path.is_file()])
+        images = dict([(png_path.stem, pg.image.load(str(png_path))) for png_path in pathlib.Path(path).rglob('*.png') if png_path.is_file()])
         # reversing pipes
-        images.update(dict([(f'reversed-{path.stem}', pg.transform.flip(pg.image.load(str(path)), False, True)) for path in pathlib.Path(Settings.SPRITE_DIR_PATH).rglob('*.png') if path.is_file() and 'pipe' in str(path)]))
+        images.update(dict([(f'reversed-{png_path.stem}', pg.transform.flip(pg.image.load(str(png_path)), False, True)) for png_path in pathlib.Path(path).rglob('*.png') if png_path.is_file() and 'pipe' in str(png_path)]))
         #
         if not Settings.USE_OFFICIAL_ASSETS :
             font = pg.font.SysFont(None, Settings.FONT_SIZE)
@@ -183,11 +185,15 @@ class SpriteHandler:
         self.group_background.update()
         self.group_collide.update()
         self.group_bird.update()
+        self.smoke.set_speed(-4*self.base.vel_x*self.app.dt, -self.bird.vel_y*self.app.dt)
+        self.smoke.set_source_position(self.bird.x, self.bird.y)
+        self.smoke.update()
         self.group_foreground.update()
 
     def draw(self):
         self.group_background.draw(self.renderer)
         self.group_collide.draw(self.renderer)
+        self.smoke.draw()
         self.group_bird.draw(self.renderer)
         self.group_foreground.draw(self.renderer)
 

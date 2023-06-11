@@ -54,7 +54,8 @@ class Bird(SpriteUnit):
             self.vel_x = 0
             self.handler.update_speed(0)
             self.handler.sounds['hit'].play()
-            self.handler.sounds['die'].play()
+            if self.y < self.floor:
+                self.handler.sounds['die'].play()
 
         if  self.y > self.floor:
             if not self.dead:

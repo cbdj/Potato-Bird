@@ -40,12 +40,14 @@ WIN_H = 0
 # CONSTANTS
 TITLE = 'Potato Bird'
 FULLSCREEN= platform == "android"
+FPS = 165
 USE_OFFICIAL_ASSETS = False
 if USE_OFFICIAL_ASSETS : 
     ASSETS_DIR_PATH = os.path.join(base_path,'official_assets')
 else:
     ASSETS_DIR_PATH = os.path.join(base_path,'assets')
 SPRITE_DIR_PATH = os.path.join(ASSETS_DIR_PATH , 'sprites')
+PARTICLES_DIR_PATH = os.path.join(ASSETS_DIR_PATH , 'particles')
 AUDIO_DIR_PATH = os.path.join(ASSETS_DIR_PATH, 'audio')
 BIRD_COLOR = 'yellow'
 PIPE_DENSITY = 6

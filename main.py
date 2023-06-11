@@ -21,6 +21,7 @@ class App:
             self.ad_manager = AdManager()
             self.playgamesservices = PlayGamesServices(Settings.LEADERBOARD_ID)
         pg.mixer.init()
+        self.dt = 0.0
         screen_info = pg.display.Info()
         self.window = Window(title='flap.py', size=(screen_info.current_w,screen_info.current_h), fullscreen=Settings.FULLSCREEN)
         self.window.set_icon(pg.image.load(os.path.join(Settings.ASSETS_DIR_PATH,'favicon.png')))
@@ -28,7 +29,6 @@ class App:
         self.sprite_handler = SpriteHandler(self)
         self.renderer.scale = (self.sprite_handler.scale, self.sprite_handler.scale)
         self.clock = pg.time.Clock()
-        self.dt = 0.0
         self.font = pg.font.SysFont('Verdana', Settings.FONT_SIZE//2)
         self.fps_size = (Settings.FONT_SIZE * 13, Settings.FONT_SIZE//2)
         self.speed = Settings.SPEED
@@ -39,10 +39,11 @@ class App:
 
     def update(self):
         self.sprite_handler.update()
-        self.dt = self.clock.tick(165) * 0.001
+        self.dt = self.clock.tick(Settings.FPS) * 0.001
 
     def draw_fps(self):
-        img = Image(Texture.from_surface(self.renderer, Exfont.text_speech(self.font, f'{self.clock.get_fps() :.0f} FPS | {self.sprite_handler.count_sprites()} SPRITES','green', True, 1, 'black')))
+        # img = Image(Texture.from_surface(self.renderer, Exfont.text_speech(self.font, f'{self.clock.get_fps() :.0f} FPS | {self.sprite_handler.count_sprites()} SPRITES','green', True, 1, 'black')))
+        img = Image(Texture.from_surface(self.renderer, self.font.render(f'{self.clock.get_fps() :.0f} FPS | {self.sprite_handler.count_sprites()} SPRITES', True, 'green')))
         img.draw(img.get_rect(),img.get_rect())
         
 
