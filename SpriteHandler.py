@@ -66,7 +66,6 @@ class SpriteHandler:
         self.group_foreground = pg.sprite.Group(self.score)
         
         self._started = False
-        self._paused = False
 
         self.pipe_width = self.images['pipe-green'].get_width()
         self.pipe_requeue_interval = self.rand_pipe_requeue_interval(Settings.SPEED)
@@ -76,7 +75,6 @@ class SpriteHandler:
     def reset(self):
         self.day=True
         self._started = False
-        self._paused = False
         self.background.reset()
         self.score.reset()
         self.bird.reset()
@@ -215,9 +213,7 @@ class SpriteHandler:
             self.on_action()
 
     def on_action(self):
-        if self._paused:
-            self._paused = False
-        elif not self._started:
+        if not self._started:
             if self.bird.dead:
                 self.reset()
             else:

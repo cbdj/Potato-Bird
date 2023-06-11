@@ -106,7 +106,10 @@ class PlayGamesServices():
     @run_on_ui_thread
     def submit_score(self, score):
         JavaBridge.PlayGames.getLeaderboardsClient(self.activity).submitScore(self.leaderboard_id, score);
-        print(f"PlayGamesServices : {self.player.getDisplayName()} submitted a new high score : {score}")
+        if self.player is not None:
+            print(f"PlayGamesServices : {self.player.getDisplayName()} submitted a new high score : {score}")
+        else:
+            print("PlayGamesServices : getPlayersClient failed, can't submit highscore")
         
     @run_on_ui_thread
     def show_leaderboard(self):

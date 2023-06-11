@@ -1,12 +1,12 @@
 import sys
 import os     
-os.environ['SDL_HINT_RENDER_SCALE_QUALITY'] = '1'
+os.environ['SDL_HINT_RENDER_SCALE_QUALITY'] = '2'
 sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 import Settings
+from pygame._sdl2.video import Window, Renderer, Texture, Image
 from SpriteHandler import SpriteHandler
 import pygame as pg
 # import pygame.freetype as ft
-from pygame._sdl2.video import Window, Renderer, Texture, Image
 import Exfont 
 
 __version__ = "1.1.0"
@@ -34,6 +34,7 @@ class App:
         self.speed = Settings.SPEED
         self.running = True
         self.display_fps = False
+        self.background = False
         
 
     def update(self):
@@ -54,7 +55,13 @@ class App:
 
     def check_events(self):
         for e in pg.event.get():
-            if e.type == pg.QUIT:
+            if e.type == 259 :#pg.APP_WILLENTERBACKGROUND
+                print("pygame APP_WILLENTERBACKGROUND")
+                self.background = True
+            elif e.type == 262: #pg.APP_DIDENTERFOREGROUND
+                print("pygame APP_DIDENTERFOREGROUND")
+                self.background = False
+            elif e.type == pg.QUIT or e.type == 257: #pg.APP_TERMINATING
                 self.running = False
             elif e.type == pg.MOUSEBUTTONDOWN:
                 self.sprite_handler.on_mouse_press()
@@ -68,7 +75,7 @@ class App:
                 else:
                     self.sprite_handler.on_key_press(e.key)
             elif e.type == Settings.EVENT_DAY_NIGHT:
-                if self.sprite_handler._started and not self.sprite_handler._paused: 
+                if self.sprite_handler._started : 
                     self.sprite_handler.background.toggle_day_night()
                     self.speed += Settings.SPEED_INCREASE_FACTOR
                     self.sprite_handler.update_speed(self.speed)
@@ -80,8 +87,9 @@ class App:
     def run(self):
         while self.running:
             self.check_events()
-            self.update()
-            self.draw()
+            if not self.background:
+                self.update()
+                self.draw()
         self.sprite_handler.quit()
         pg.mixer.quit()
         pg.quit()
