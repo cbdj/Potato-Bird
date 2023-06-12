@@ -5,7 +5,7 @@ class AdManager():
     def __init__(self):
         simpleam.simpleam_init()
         self.ad = simpleam.Interstitial(Settings.INTERSTITIAL_ID)
-        self.banner = simpleam.Banner(Settings.BANNER_ID, "BOTTOM", "BANNER")
+        self.banner = simpleam.Banner(Settings.BANNER_ID, "TOP", "BANNER")
         self.banner.load_ad()
         self.banner.set_visibility(True)
         # self.ad = simpleam.Rewarded()

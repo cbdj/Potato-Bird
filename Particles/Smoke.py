@@ -14,7 +14,7 @@ class SmokeParticle:
         self.index_scale_k = 0
         self.textures = textures
         self.img = self.textures[0]
-        self.alpha = 255
+        self.alpha = self.img.alpha
         self.alpha_rate = 3
         self.alive = True
         self.vy = vel_y
@@ -46,7 +46,9 @@ class SmokeParticle:
 
 class Smoke:
     def __init__(self, renderer, surface, x, y):
-        self.textures = [Image(Texture.from_surface(renderer, scale(surface, factor))) for factor in np.arange(0.1,1,0.005)]
+        self.textures = [Image(Texture.from_surface(renderer, scale(surface, factor))) for factor in reversed(np.arange(0.1,1,0.005))]
+        for texture in self.textures:
+            texture.alpha = surface.get_alpha()
         self.x = x
         self.y = y
         self.vel_x = 0

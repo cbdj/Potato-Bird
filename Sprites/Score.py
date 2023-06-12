@@ -10,13 +10,9 @@ class Score(SpriteUnit):
         self.remote_best=0
         self.score=0
         self.font_size = font_size
-        path = '.'
-        try :
-            path = pg.system.get_pref_path()
-        except Exception as e:
-            print(f'Erreur : {e}')
-        self.score_path = os.path.join(path, 'score.txt')
-        print(f'score file path : {self.score_path}')
+        current_path = '.'
+        self.score_path = os.path.join(current_path, 'record.txt')
+        print(f'Record file path : {os.path.abspath(self.score_path)}')
         if os.path.exists(self.score_path):
             with open(self.score_path,'r') as score_file:
                 self.best=int(score_file.read())

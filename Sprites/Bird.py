@@ -17,7 +17,7 @@ class Bird(SpriteUnit):
         self.bump_speed = bump_speed
 
     def translate(self):
-        if self.x < self.orig_x/2:
+        if self.x < 2*self.orig_x/3:
             self.vel_x = 0
         else:
             self.x += self.vel_x * self.handler.app.dt

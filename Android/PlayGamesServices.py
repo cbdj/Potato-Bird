@@ -91,12 +91,16 @@ class PlayGamesServices():
     @run_on_ui_thread
     def _on_get_remote_best_success(self, leaderboardScoreAnnotatedData):
         print(f"PlayGamesServices : _on_get_remote_best_complete")
-        scoresResult =  leaderboardScoreAnnotatedData.get()
-        scoreResult = scoresResult.getScores().get(0) if scoresResult is not None else None
+        scoreResult =  leaderboardScoreAnnotatedData.get()
         if scoreResult is not None:
+            print(scoreResult.getDisplayRank())
+            print(scoreResult.getDisplayScore())
+            print(scoreResult.getScoreHolderDisplayName())
             remote_best = scoreResult.getRawScore()
             print(f"PlayGamesServices : Fetched remote best : {remote_best}")
             self.on_fetched_best(remote_best)
+        else:
+            print(f"PlayGamesServices : Fetched remote best error: scoreResult is None")
         leaderboardScoreAnnotatedData = None
      
     def _set_player(self, player):
@@ -109,16 +113,20 @@ class PlayGamesServices():
         if self.player is not None:
             print(f"PlayGamesServices : {self.player.getDisplayName()} submitted a new high score : {score}")
         else:
-            print("PlayGamesServices : getPlayersClient failed, can't submit highscore")
+            print("PlayGamesServices : No player info, can't submit highscore")
         
     @run_on_ui_thread
     def show_leaderboard(self):
-        print(f"PlayGamesServices : Queuing Showing LeaderBoard")
-        JavaBridge.PlayGames.getLeaderboardsClient(self.activity).getLeaderboardIntent(self.leaderboard_id).addOnSuccessListener(OnSuccessListener(self._on_show_leaderboard_success) )
+        if not self.signed:
+            print(f"PlayGamesServices : Try SignIn")
+            self.gamesSignInClient.signIn()
+        else:
+            print(f"PlayGamesServices : Queuing Showing LeaderBoard")
+            JavaBridge.PlayGames.getLeaderboardsClient(self.activity).getLeaderboardIntent(self.leaderboard_id).addOnSuccessListener(OnSuccessListener(self._on_show_leaderboard_success))
 
     @run_on_ui_thread
     def get_remote_best(self, callback):
         print(f"PlayGamesServices : Queuing Get Remote Best")
         self.on_fetched_best = callback
-        leaderboards_client = JavaBridge.PlayGames.getLeaderboardsClient(self.activity).loadPlayerCenteredScores(self.leaderboard_id, JavaBridge.LeaderboardVariant.TIME_SPAN_ALL_TIME, JavaBridge.LeaderboardVariant.COLLECTION_PUBLIC, 1)
+        leaderboards_client = JavaBridge.PlayGames.getLeaderboardsClient(self.activity).loadCurrentPlayerLeaderboardScore(self.leaderboard_id, JavaBridge.LeaderboardVariant.TIME_SPAN_ALL_TIME, JavaBridge.LeaderboardVariant.COLLECTION_PUBLIC)
         leaderboards_client.addOnSuccessListener(OnSuccessListener(self._on_get_remote_best_success))

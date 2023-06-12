@@ -15,13 +15,13 @@ def get_platform():
         
 platform = get_platform()
 
+package_domain="com.cldejessey"
+package_name="flappy"
 if platform=="android":
-    package_domain="com.cldejessey"
-    package_name="flappy"
     base_path=os.path.abspath(f"/data/data/{package_domain}.{package_name}/files/app/")
     INTERSTITIAL_ID="ca-app-pub-4493613666001226/1483234688"
     BANNER_ID="ca-app-pub-4493613666001226/5140290547"
-    LEADERBOARD_ID="CgkIzdaAt-geEAIQAQ"
+    LEADERBOARD_ID="CgkIzdaAt-geEAIQAg"
     
 elif platform=="win":
     try:
@@ -53,7 +53,7 @@ BIRD_COLOR = 'yellow'
 PIPE_DENSITY = 6
 BUMP_SPEED = 300
 FONT_SIZE = 40
-SPEED = 120 # initial pipe and base speed
+SPEED = 130 # initial pipe and base speed
 SPEED_INCREASE_FACTOR = 20 # speed increase at each day/night event
 DAY_NIGHT_TIME_MS = 10000
 EVENT_DAY_NIGHT = pg.USEREVENT+1

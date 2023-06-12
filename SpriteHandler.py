@@ -45,7 +45,18 @@ class SpriteHandler:
 
         # Creating Bird sprite
         self.bird = Bird(self, self.images[Settings.BIRD_COLOR + 'bird-downflap'], self.images[Settings.BIRD_COLOR + 'bird-midflap'], self.images[Settings.BIRD_COLOR + 'bird-upflap'], Settings.WIN_W // 2, Settings.WIN_H // 2, Settings.BUMP_SPEED, Settings.BIRD_MASS_KG)
-        self.smoke = Smoke(self.renderer, self.particles['smoke'],self.bird.x,self.bird.y)
+        trainee = pg.transform.scale(self.particles['smoke'],(1.5*self.bird.rect.height, 1.5*self.bird.rect.height))
+        trainee.set_alpha(50)
+        def offset_color(surface: pg.Surface, offset):
+            for i in range(surface.get_width()):
+                for j in range(surface.get_height()):
+                    pixel = surface.get_at((i,j))
+                    pixel.r = min(max(0,pixel.r+offset),255)
+                    pixel.g = min(max(0,pixel.g+offset),255)
+                    pixel.b = min(max(0,pixel.b+offset),255)
+                    surface.set_at((i,j), pixel)
+        offset_color(trainee,60)
+        self.smoke = Smoke(self.renderer, trainee,self.bird.x,self.bird.y)
         # Creating menu
         
         if Settings.USE_OFFICIAL_ASSETS:
@@ -185,7 +196,7 @@ class SpriteHandler:
         self.group_background.update()
         self.group_collide.update()
         self.group_bird.update()
-        self.smoke.set_speed(-4*self.base.vel_x*self.app.dt, -self.bird.vel_y*self.app.dt)
+        self.smoke.set_speed(-3*self.base.vel_x*self.app.dt, -self.bird.vel_y*self.app.dt)
         self.smoke.set_source_position(self.bird.x, self.bird.y)
         self.smoke.update()
         self.group_foreground.update()
@@ -249,9 +260,8 @@ class SpriteHandler:
         self.score.save_best()
         self.stop()
         if Settings.platform=='android':
-            if self.score.score == self.score.best:
-                self.app.playgamesservices.submit_score(self.score.best)
-            else:
+            self.app.playgamesservices.submit_score(self.score.score)
+            if self.score.score < self.score.best:
                 # get punished
                 self.app.ad_manager.may_show()
 
