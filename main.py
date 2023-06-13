@@ -9,7 +9,7 @@ import pygame as pg
 # import pygame.freetype as ft
 import Exfont 
 
-__version__ = "1.1.2"
+__version__ = "1.1.3"
 
 
 class App:

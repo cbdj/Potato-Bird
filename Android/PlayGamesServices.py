@@ -7,44 +7,30 @@ class JavaBridge:
     PlayGames = autoclass("com.google.android.gms.games.PlayGames")
     Activity = autoclass("org.kivy.android.PythonActivity")
     OnCompleteListener_AuthenticationResult = autoclass("com.cldejessey.OnCompleteListener_AuthenticationResult")
-    OnCompleteListener_String = autoclass("com.cldejessey.OnCompleteListener_String")
     OnCompleteListener_Player = autoclass("com.cldejessey.OnCompleteListener_Player")
     LeaderboardVariant = autoclass("com.google.android.gms.games.leaderboard.LeaderboardVariant")
-    
-class OnCompleteListener_String(PythonJavaClass):
-    " AdMob banner ad class. "
-    __javainterfaces__ = ("com.cldejessey.OnCompleteListener_StringInterface", )
-    __javacontext__ = "app"
-    def __init__(self, callback):
-        self.callback = callback
-        pass
-    @java_method('(Lutil/lang/String;)V')
-    def onComplete(self, result):
-        print(result)
-        self.callback(result)
         
 class OnCompleteListener_Player(PythonJavaClass):
-    " AdMob banner ad class. "
     __javainterfaces__ = ("com.cldejessey.OnCompleteListener_PlayerInterface", )
     __javacontext__ = "app"
     def __init__(self, callback):
         self.callback = callback
-        pass
+
     @java_method('(Lcom/google/android/gms/games/Player;)V')
     def onComplete(self, result):
+        print(f"PlayGamesServices : onComplete Player callback")
         print(result)
         self.callback(result)
     
 class OnCompleteListener_AuthenticationResult(PythonJavaClass):
-    " AdMob banner ad class. "
     __javainterfaces__ = ("com.cldejessey.OnCompleteListener_AuthenticationResultInterface", )
     __javacontext__ = "app"
     def __init__(self, on_signin_complete):
         self.on_signin_complete = on_signin_complete
-        pass
+
     @java_method('(Lcom/google/android/gms/games/AuthenticationResult;)V')
     def onComplete(self, result):
-        print(result.isAuthenticated())
+        print(f"PlayGamesServices : Authentication result : {result.isAuthenticated()}")
         self.on_signin_complete(result.isAuthenticated())
         
 class OnSuccessListener(PythonJavaClass):
@@ -52,20 +38,18 @@ class OnSuccessListener(PythonJavaClass):
     __javacontext__ = "app"
     def __init__(self, callback):
         self.callback = callback
-        pass
+
     @java_method('(Ljava/lang/Object;)V')
     def onSuccess(self, obj):
+        print(f"PlayGamesServices : onSuccess callback")
         self.callback(obj)
 
-    
 class PlayGamesServices():
     @run_on_ui_thread
     def __init__(self, leaderboard_id):
         self.activity = JavaBridge.Activity.mActivity
         JavaBridge.PlayGamesSdk.initialize(self.activity)
-        self.gamesSignInClient = JavaBridge.PlayGames.getGamesSignInClient(self.activity);
-        isAuthenticatedTask = OnCompleteListener_AuthenticationResult(self._on_signin_complete)
-        self.gamesSignInClient.isAuthenticated().addOnCompleteListener(JavaBridge.OnCompleteListener_AuthenticationResult(isAuthenticatedTask))
+        JavaBridge.PlayGames.getGamesSignInClient(self.activity).isAuthenticated().addOnCompleteListener(JavaBridge.OnCompleteListener_AuthenticationResult(OnCompleteListener_AuthenticationResult(self._on_signin_complete)))
         self.signed = False
         self.player = None
         self.leaderboard_id = leaderboard_id
@@ -73,15 +57,13 @@ class PlayGamesServices():
         
     @run_on_ui_thread
     def _on_signin_complete(self, result):
-        if not result:
+        if result:
+            self.signed = True
+            JavaBridge.PlayGames.getPlayersClient(self.activity).getCurrentPlayer().addOnCompleteListener(JavaBridge.OnCompleteListener_Player(OnCompleteListener_Player(self._set_player)))
+            print("PlayGamesServices : Successful GooglePlay signin")
+        else:
             self.signed = False
             print("PlayGamesServices : Failed GooglePlay signin")
-            # add a button whom callback does self.gamesSignInClient.signIn()
-        else:
-            self.signed = True
-            getPlayersClient = OnCompleteListener_Player(self._set_player)
-            JavaBridge.PlayGames.getPlayersClient(self.activity).getCurrentPlayer().addOnCompleteListener(JavaBridge.OnCompleteListener_Player(getPlayersClient))
-            print("PlayGamesServices : Successful GooglePlay signin")
             
     @run_on_ui_thread
     def _on_show_leaderboard_success(self, intent):
@@ -109,8 +91,8 @@ class PlayGamesServices():
         
     @run_on_ui_thread
     def submit_score(self, score):
-        JavaBridge.PlayGames.getLeaderboardsClient(self.activity).submitScore(self.leaderboard_id, score);
         if self.player is not None:
+            JavaBridge.PlayGames.getLeaderboardsClient(self.activity).submitScore(self.leaderboard_id, score);
             print(f"PlayGamesServices : {self.player.getDisplayName()} submitted a new high score : {score}")
         else:
             print("PlayGamesServices : No player info, can't submit highscore")
@@ -119,7 +101,7 @@ class PlayGamesServices():
     def show_leaderboard(self):
         if not self.signed:
             print(f"PlayGamesServices : Try SignIn")
-            self.gamesSignInClient.signIn()
+            JavaBridge.PlayGames.getGamesSignInClient(self.activity).signIn()
         else:
             print(f"PlayGamesServices : Queuing Showing LeaderBoard")
             JavaBridge.PlayGames.getLeaderboardsClient(self.activity).getLeaderboardIntent(self.leaderboard_id).addOnSuccessListener(OnSuccessListener(self._on_show_leaderboard_success))
@@ -128,5 +110,4 @@ class PlayGamesServices():
     def get_remote_best(self, callback):
         print(f"PlayGamesServices : Queuing Get Remote Best")
         self.on_fetched_best = callback
-        leaderboards_client = JavaBridge.PlayGames.getLeaderboardsClient(self.activity).loadCurrentPlayerLeaderboardScore(self.leaderboard_id, JavaBridge.LeaderboardVariant.TIME_SPAN_ALL_TIME, JavaBridge.LeaderboardVariant.COLLECTION_PUBLIC)
-        leaderboards_client.addOnSuccessListener(OnSuccessListener(self._on_get_remote_best_success))
+        JavaBridge.PlayGames.getLeaderboardsClient(self.activity).loadCurrentPlayerLeaderboardScore(self.leaderboard_id, JavaBridge.LeaderboardVariant.TIME_SPAN_ALL_TIME, JavaBridge.LeaderboardVariant.COLLECTION_PUBLIC).addOnSuccessListener(OnSuccessListener(self._on_get_remote_best_success))

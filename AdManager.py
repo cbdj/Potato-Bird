@@ -24,6 +24,8 @@ class AdManager():
             
     def reload(self): 
         print('AdManager : reloading')
+        if not self.banner.is_loading() and not self.banner.is_loaded():
+            self.banner.load_ad()
         if self.ad.is_loading():
             return
         if not self.loaded or not self.ad.is_loaded():
@@ -35,10 +37,8 @@ class AdManager():
                 self.showed = False
                 pg.time.set_timer(Settings.EVENT_AD, Settings.AD_TIME_MS)
                 self.timeout = False
-                self.banner.load_ad()
         
     def on_timeout(self):
         print('AdManager : timeout')
         self.timeout = True
-        # self.banner.set_visibility(not self.banner.get_visibility())
         

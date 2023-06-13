@@ -133,7 +133,7 @@ class SpriteHandler:
         images.update(dict([(f'reversed-{png_path.stem}', pg.transform.flip(pg.image.load(str(png_path)), False, True)) for png_path in pathlib.Path(path).rglob('*.png') if png_path.is_file() and 'pipe' in str(png_path)]))
         #
         if not Settings.USE_OFFICIAL_ASSETS :
-            font = pg.font.SysFont(None, Settings.FONT_SIZE)
+            font = pg.font.SysFont('Verdana', Settings.FONT_SIZE)
             # create 'gameover' asset
             images['gameover'] = Exfont.text_speech(font, 'GAME OVER', 'orange', True, 2, 'white')
             # create 'message' asset

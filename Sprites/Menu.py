@@ -1,4 +1,3 @@
-
 import pygame as pg
 from pygame import Surface
 from pygame._sdl2 import Image, Texture
@@ -10,19 +9,11 @@ import pygame.gfxdraw as gfx
 class Menu(SpriteUnit):
     def __init__(self, handler, x, y, title : str, bird : Surface, font_size : int):
         surface = pg.Surface((2*x,2*y), pg.SRCALPHA)
-        font = pg.font.SysFont(None, font_size)
-        half_font = pg.font.SysFont(None, font_size//2)
+        font = pg.font.SysFont('Verdana', font_size)
+        half_font = pg.font.SysFont('Verdana', font_size//2)
         title = Exfont.text_speech(font, title, 'white', True, 2, 'black')
         get_ready = Exfont.text_speech(font, 'GET READY!', 'green', True, 2, 'black')
-        def grayscale(surface : pg.Surface):
-            ret = surface.copy()
-            for x in range(surface.get_width()):
-                for y in range(surface.get_height()):
-                    pixel: pg.Color = surface.get_at((x, y))
-                    grey_pixel = 0.299 * pixel.r + 0.587 * pixel.g + 0.114 * pixel.b
-                    ret.set_at((x,y), (grey_pixel, grey_pixel, grey_pixel, pixel.a))
-            return ret
-        grey_bird = grayscale(bird)
+        grey_bird = pg.transform.grayscale(bird)
         index_w = index_w_bird = surface.get_width()//2-grey_bird.get_width()//2
         index_h = index_h_bird = surface.get_height()//2 - grey_bird.get_height()//2
         surface.blit(grey_bird, (index_w, index_h))

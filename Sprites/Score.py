@@ -1,4 +1,3 @@
-
 import pygame as pg
 import os
 from pygame._sdl2 import Image, Texture
@@ -46,5 +45,5 @@ class Score(SpriteUnit):
                 score_file.write(str(self.best))
 
     def get_surface(self):
-        surface = pg.font.SysFont(None, self.font_size).render( f'Best : {self.best}  Score : {self.score}', True, 'white')
+        surface = pg.font.SysFont('Verdana', self.font_size).render( f'Best : {self.best}  Score : {self.score}', True, 'white')
         return surface
