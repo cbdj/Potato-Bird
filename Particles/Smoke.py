@@ -1,6 +1,5 @@
 import pygame as pg
 import random
-import numpy as np
 from pygame._sdl2 import Texture, Image, Renderer
 
 def scale(img: pg.Surface, factor):
@@ -46,7 +45,7 @@ class SmokeParticle:
 
 class Smoke:
     def __init__(self, renderer, surface, x, y):
-        self.textures = [Image(Texture.from_surface(renderer, scale(surface, factor))) for factor in reversed(np.arange(0.1,1,0.005))]
+        self.textures = [Image(Texture.from_surface(renderer, scale(surface, factor/1000))) for factor in reversed(range(100,1000,5))]
         for texture in self.textures:
             texture.alpha = surface.get_alpha()
         self.x = x
