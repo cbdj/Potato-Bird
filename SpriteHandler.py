@@ -66,6 +66,7 @@ class SpriteHandler:
         def callback():
             if Settings.platform == 'android':
                 self.app.playgamesservices.show_leaderboard()
+                pass
         self.leaderboard_button = Button(self, self.images['leaderboard_button'], self.images['leaderboard_button_pressed'], Settings.WIN_W / 2, 2*Settings.WIN_H /3, callback)
         self._gameover = SpriteUnit(self,self.images['gameover'], Settings.WIN_W / 2, Settings.WIN_H / 2)
         self.score=Score(self, Settings.WIN_W / 2, 2*Settings.FONT_SIZE, Settings.FONT_SIZE)

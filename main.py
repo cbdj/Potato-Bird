@@ -2,7 +2,10 @@ import sys
 import os     
 os.environ['SDL_HINT_RENDER_SCALE_QUALITY'] = '2'
 sys.path.append(os.path.dirname(os.path.realpath(__file__)))
-import Settings
+import Settings        
+if Settings.platform=='android':
+    from AdManager import AdManager 
+    from Android.PlayGamesServices import PlayGamesServices
 from pygame._sdl2.video import Window, Renderer, Texture, Image
 from SpriteHandler import SpriteHandler
 import pygame as pg
@@ -11,15 +14,12 @@ import Exfont
 
 __version__ = "1.1.4"
 
-
 class App:
     def __init__(self):
-        pg.init()
         if Settings.platform=='android':
-            from AdManager import AdManager 
-            from Android.PlayGamesServices import PlayGamesServices
             self.ad_manager = AdManager()
             self.playgamesservices = PlayGamesServices(Settings.LEADERBOARD_ID)
+        pg.init()
         pg.mixer.init()
         self.dt = 0.0
         screen_info = pg.display.Info()
@@ -96,5 +96,4 @@ class App:
         pg.quit()
 
 if __name__ == '__main__':
-    app = App()
-    app.run()
+    App().run()
