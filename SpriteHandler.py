@@ -19,7 +19,6 @@ class SpriteHandler:
         self.renderer = self.app.renderer
         self.images = self.load_png(Settings.SPRITE_DIR_PATH)
         self.particles = self.load_png(Settings.PARTICLES_DIR_PATH)
-        self.sounds = self.load_sounds()
 
         # Adapting dimensions to screen resolution
         Settings.WIN_W, Settings.WIN_H = self.compute_size()
@@ -63,11 +62,14 @@ class SpriteHandler:
             self.menu = SpriteUnit(self, self.images['message'], Settings.WIN_W / 2, Settings.WIN_H / 2)
         else:
             self.menu = Menu(self, Settings.WIN_W / 2, Settings.WIN_H / 2, Settings.TITLE, self.images[Settings.BIRD_COLOR + 'bird-midflap'], Settings.FONT_SIZE)
-        def callback():
+        def show_leaderboard():
             if Settings.platform == 'android':
                 self.app.playgamesservices.show_leaderboard()
                 pass
-        self.leaderboard_button = Button(self, self.images['leaderboard_button'], self.images['leaderboard_button_pressed'], Settings.WIN_W / 2, 2*Settings.WIN_H /3, callback)
+        self.leaderboard_button = Button(self, self.images['leaderboard_button'], self.images['leaderboard_button_pressed'], Settings.WIN_W / 2, 2*Settings.WIN_H /3, show_leaderboard)
+        def show_settings():
+            self.app.configuration.enable()
+        self.show_settings_button = Button(self, self.images['settings'], self.images['settings'], Settings.WIN_W - self.images['settings'].get_width(), self.images['settings'].get_height(), show_settings)
         self._gameover = SpriteUnit(self,self.images['gameover'], Settings.WIN_W / 2, Settings.WIN_H / 2)
         self.score=Score(self, Settings.WIN_W / 2, 2*Settings.FONT_SIZE, Settings.FONT_SIZE)
         if Settings.platform == 'android':
@@ -96,7 +98,7 @@ class SpriteHandler:
             pipe.reset()
             pipe_reversed.reset()
         self.group_foreground.empty()
-        self.group_foreground.add(self.menu, self.score)
+        self.group_foreground.add(self.menu, self.score, self.show_settings_button)
         if Settings.platform == 'android':
             self.group_foreground.add(self.leaderboard_button)
         self.update_speed(0)
@@ -152,13 +154,6 @@ class SpriteHandler:
         self.images['background-night'] = extend_image(self.images['background-night'], new_width)
         self.images['base'] = extend_image(self.images['base'], 2*new_width)
 
-    def load_sounds(self):
-        """ from .ogg to pygame Sound """
-        exts=['.ogg','.mp3']
-        sounds = dict([(path.stem, pg.mixer.Sound(str(path))) for path in pathlib.Path(Settings.AUDIO_DIR_PATH).rglob('*.*') if path.is_file() and path.suffix in exts])
-        return sounds
-
-
     def maybe_requeue_pipes(self):
         def pipe_requeue(pipe, pipe_reversed):
             """ 
@@ -183,7 +178,7 @@ class SpriteHandler:
     def update_score(self):
         for (pipe1,pipe2) in self.pipes:
             if pipe1.x < self.bird.x and not pipe1.point_given:
-                self.sounds['point'].play()
+                pg.event.post(pg.event.Event(Settings.EVENT_SOUND, sound = 'point'))
                 self.score.increment()
                 pipe1.point_given = True
                 break
@@ -216,6 +211,8 @@ class SpriteHandler:
             x,y = x/self.scale, y/self.scale
             if self.leaderboard_button.alive() and self.leaderboard_button.rect.collidepoint((x, y)):
                 self.leaderboard_button.press()
+            elif self.show_settings_button.alive() and self.show_settings_button.rect.collidepoint((x, y)):
+                self.show_settings_button.press()
             else:
                 self.on_action()
         elif mouse_button[2]:
@@ -225,6 +222,8 @@ class SpriteHandler:
         mouse_button = pg.mouse.get_pressed()
         if not mouse_button[0] and self.leaderboard_button.pressed:
             self.leaderboard_button.unpress()
+        if not mouse_button[0] and self.show_settings_button.pressed:
+            self.show_settings_button.unpress()
 
     def on_key_press(self, key):
         if key == pg.K_SPACE:

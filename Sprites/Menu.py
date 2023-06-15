@@ -30,8 +30,8 @@ class Menu(SpriteUnit):
         gfx.filled_trigon(surface,index_w_bird + 2*grey_bird.get_width(), index_h_bird, index_w_bird + grey_bird.get_width(), index_h_bird + grey_bird.get_height()//2,index_w_bird + 2*grey_bird.get_width(), index_h_bird +2*grey_bird.get_height()//2, (255,0,0))
         # Building arrows legends
         tap = Exfont.text_speech(half_font, 'TAP!', 'white', True, 1, 'black')
-        surface.blit(tap, (index_w_bird - 3*grey_bird.get_width()/2, index_h_bird+grey_bird.get_height()/4))
-        surface.blit(tap, (index_w_bird + 3*grey_bird.get_width()/2, index_h_bird+grey_bird.get_height()/4))
+        surface.blit(tap, (index_w_bird - 2*grey_bird.get_width(), index_h_bird))
+        surface.blit(tap, (index_w_bird + 2*grey_bird.get_width(), index_h_bird))
         super().__init__(handler, surface, x, y)
 
    

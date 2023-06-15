@@ -8,12 +8,14 @@ if Settings.platform=='android':
     from Android.PlayGamesServices import PlayGamesServices
 from pygame._sdl2.video import Window, Renderer, Texture, Image
 from SpriteHandler import SpriteHandler
+from SoundHandler import SoundHandler
+from Configuration import Configuration
 import pygame as pg
+import pygame_menu
 # import pygame.freetype as ft
 import Exfont 
 
 __version__ = "1.1.5"
-
 class App:
     def __init__(self):
         if Settings.platform=='android':
@@ -27,6 +29,8 @@ class App:
         self.window.set_icon(pg.image.load(os.path.join(Settings.ASSETS_DIR_PATH,'favicon.png')))
         self.renderer = Renderer(self.window)
         self.sprite_handler = SpriteHandler(self)
+        self.configuration = Configuration(self)
+        self.sound_handler = SoundHandler(Settings.AUDIO_DIR_PATH)
         self.renderer.scale = (self.sprite_handler.scale, self.sprite_handler.scale)
         self.clock = pg.time.Clock()
         self.font = pg.font.SysFont('Verdana', Settings.FONT_SIZE//2)
@@ -36,6 +40,11 @@ class App:
         self.display_fps = False
         self.background = False
         
+    def mute(self):
+        self.sound_handler.mute()
+
+    def unmute(self):
+        self.sound_handler.unmute()
 
     def update(self):
         self.sprite_handler.update()
@@ -52,10 +61,13 @@ class App:
         self.sprite_handler.draw()
         if self.display_fps:
             self.draw_fps()
+        if self.configuration.is_enabled():
+            self.configuration.draw(self.renderer)
         self.renderer.present()
 
     def check_events(self):
-        for e in pg.event.get():
+        events = pg.event.get()
+        for e in events:
             if e.type == 259 :#pg.APP_WILLENTERBACKGROUND
                 print("pygame APP_WILLENTERBACKGROUND")
                 self.background = True
@@ -64,26 +76,31 @@ class App:
                 self.background = False
             elif e.type == pg.QUIT or e.type == 257: #pg.APP_TERMINATING
                 self.running = False
-            elif e.type == pg.MOUSEBUTTONDOWN:
-                self.sprite_handler.on_mouse_press()
-            elif e.type == pg.MOUSEBUTTONUP:
-                self.sprite_handler.on_mouse_unpress()
-            elif e.type == pg.KEYDOWN:
-                if e.key == pg.K_ESCAPE:
-                    self.running = False
-                if e.key == pg.K_d:
-                    self.display_fps = not self.display_fps
-                else:
-                    self.sprite_handler.on_key_press(e.key)
-            elif e.type == Settings.EVENT_DAY_NIGHT:
-                if self.sprite_handler._started : 
-                    self.sprite_handler.background.toggle_day_night()
-                    self.speed += Settings.SPEED_INCREASE_FACTOR
-                    self.sprite_handler.update_speed(self.speed)
-                    self.sprite_handler.sounds['swoosh'].play()
+            elif e.type == Settings.EVENT_SOUND:
+                self.sound_handler.play(e.sound)
             elif e.type == Settings.EVENT_AD:
                 print('EVENT_AD')
                 self.ad_manager.on_timeout()
+            elif not self.configuration.is_enabled():
+                if e.type == pg.KEYDOWN:
+                    if e.key == pg.K_ESCAPE:
+                        self.running = False
+                    if e.key == pg.K_d:
+                        self.display_fps = not self.display_fps
+                    else:
+                        self.sprite_handler.on_key_press(e.key)
+                elif e.type == pg.MOUSEBUTTONDOWN:
+                    self.sprite_handler.on_mouse_press()
+                elif e.type == pg.MOUSEBUTTONUP:
+                    self.sprite_handler.on_mouse_unpress()
+                elif e.type == Settings.EVENT_DAY_NIGHT:
+                    if self.sprite_handler._started : 
+                        self.sprite_handler.background.toggle_day_night()
+                        self.speed += Settings.SPEED_INCREASE_FACTOR
+                        self.sprite_handler.update_speed(self.speed)
+                        pg.event.post(pg.event.Event(Settings.EVENT_SOUND, sound = 'swoosh'))
+            else:
+                self.configuration.update(events)
 
     def run(self):
         while self.running:

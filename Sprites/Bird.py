@@ -1,6 +1,7 @@
 from .SpriteUnit import SpriteUnit
 from pygame._sdl2 import Image, Texture
 import pygame as pg
+import Settings
 
 class Bird(SpriteUnit):
     def __init__(self, handler, image_down, image_middle, image_up, x, y, bump_speed, mass):
@@ -43,7 +44,8 @@ class Bird(SpriteUnit):
             return
         self.weight = self.mass
         self.vel_y = -speed
-        self.handler.sounds['wing'].play()
+        pg.event.post(pg.event.Event(Settings.EVENT_SOUND, sound = 'wing'))
+        # self.handler.sounds['wing'].play()
 
     def update(self):
         self.translate() 
@@ -53,13 +55,16 @@ class Bird(SpriteUnit):
             self.hit = True
             self.vel_x = 0
             self.handler.update_speed(0)
-            self.handler.sounds['hit'].play()
+            pg.event.post(pg.event.Event(Settings.EVENT_SOUND, sound = 'hit'))
+            # self.handler.sounds['hit'].play()
             if self.y < self.floor:
-                self.handler.sounds['die'].play()
+                pg.event.post(pg.event.Event(Settings.EVENT_SOUND, sound = 'die'))
+                # self.handler.sounds['die'].play()
 
         if  self.y > self.floor:
             if not self.dead:
-                self.handler.sounds['hit'].play()
+                pg.event.post(pg.event.Event(Settings.EVENT_SOUND, sound = 'hit'))
+                # self.handler.sounds['hit'].play()
             self.hit = True
             self.dead= True
             self.vel_x = 0

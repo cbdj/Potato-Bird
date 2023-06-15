@@ -56,9 +56,9 @@ FONT_SIZE = 40
 SPEED = 130 # initial pipe and base speed
 SPEED_INCREASE_FACTOR = 20 # speed increase at each day/night event
 DAY_NIGHT_TIME_MS = 10000
-EVENT_DAY_NIGHT = pg.USEREVENT+1
+EVENT_DAY_NIGHT = pg.event.custom_type()
 BIRD_MASS_KG = 0.1
 
 AD_TIME_MS = 30000
-EVENT_AD = pg.USEREVENT+2
-
+EVENT_AD = pg.event.custom_type()
+EVENT_SOUND = pg.event.custom_type()
