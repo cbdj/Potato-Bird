@@ -11,7 +11,6 @@ from SpriteHandler import SpriteHandler
 from SoundHandler import SoundHandler
 from Configuration import Configuration
 import pygame as pg
-import pygame_menu
 # import pygame.freetype as ft
 import Exfont 
 
