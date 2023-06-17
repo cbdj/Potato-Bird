@@ -20,11 +20,13 @@ class SpriteHandler:
         self.images = self.load_png(Settings.SPRITE_DIR_PATH)
         self.particles = self.load_png(Settings.PARTICLES_DIR_PATH)
 
-        # Adapting dimensions to screen resolution
-        Settings.WIN_W, Settings.WIN_H = self.compute_size()
         screen_info = pg.display.Info()
-        self.scale = screen_info.current_h/Settings.WIN_H
-        Settings.WIN_W = float(Settings.WIN_W)*float(screen_info.current_w)//(float(Settings.WIN_W)*self.scale)
+        Settings.WIN_W, Settings.WIN_H = screen_info.current_w,screen_info.current_h
+        # Adapting dimensions to screen resolution
+        background_sprite_w, background_sprite_h = self.compute_size()
+        scale = screen_info.current_h/background_sprite_h
+        for key, image in self.images.items():
+            self.images[key] = pg.transform.scale(image, (image.get_rect().w * scale, image.get_rect().h * scale))
         self.extend_world(Settings.WIN_W)
 
         # Creating backgrounds sprites
@@ -84,7 +86,7 @@ class SpriteHandler:
         self._started = False
 
         self.pipe_width = self.images['pipe-green'].get_width()
-        self.pipe_requeue_interval = self.rand_pipe_requeue_interval(Settings.SPEED)
+        self.pipe_requeue_interval = self.rand_pipe_requeue_interval(self.app.speed)
         self.pipe_reque_time = 0.0
         self.reset()
 
@@ -112,7 +114,8 @@ class SpriteHandler:
         return len(self.group_bird) + len(self.group_collide) + len(self.group_background) + len(self.group_foreground)
 
     def rand_pipe_requeue_interval(self, speed):
-        return uniform(3.0,8.0)*self.pipe_width/speed
+        offset = speed/Settings.SPEED
+        return uniform(2.0 + offset,7.0 + offset)*self.pipe_width/speed
     
     def update_speed(self, speed):
         self.base.vel_x = -speed
@@ -208,7 +211,6 @@ class SpriteHandler:
         mouse_button = pg.mouse.get_pressed()
         if mouse_button[0]:
             x, y = pg.mouse.get_pos()
-            x,y = x/self.scale, y/self.scale
             if self.leaderboard_button.alive() and self.leaderboard_button.rect.collidepoint((x, y)):
                 self.leaderboard_button.press()
             elif self.show_settings_button.alive() and self.show_settings_button.rect.collidepoint((x, y)):
@@ -240,25 +242,24 @@ class SpriteHandler:
             self.bird.bump(Settings.BUMP_SPEED)
 
     def start(self):
+        self._started = True
         if Settings.platform=='android':
             self.app.ad_manager.reload()
-        self.app.speed=Settings.SPEED
         self.score.reset()
         self.group_foreground.empty()
         self.group_foreground.add(self.score)
-        self.update_speed(Settings.SPEED)
-        self._started = True
+        self.update_speed(self.app.speed)
         pg.time.set_timer(Settings.EVENT_DAY_NIGHT, Settings.DAY_NIGHT_TIME_MS)
 
     def stop(self):
-        self.update_speed(0)
         self._started = False
+        self.update_speed(0)
         pg.time.set_timer(Settings.EVENT_DAY_NIGHT, 0)
 
     def game_over(self):
+        self.stop()
         self.group_foreground.add(self._gameover)
         self.score.save_best()
-        self.stop()
         if Settings.platform=='android':
             self.app.playgamesservices.submit_score(self.score.score)
             if self.score.score < self.score.best:
@@ -267,3 +268,6 @@ class SpriteHandler:
 
     def quit(self):
         self.score.save_best()
+
+    def set_dark_mode(self,on):
+        self.background.set_dark_mode(on)

@@ -37,7 +37,7 @@ class Bird(SpriteUnit):
             self.rotate()
 
     def rotate(self):
-        self.image.angle += self.vel_y * self.handler.app.dt
+        self.image.angle += 0.5*self.vel_y * self.handler.app.dt
 
     def bump(self, speed):
         if self.hit:

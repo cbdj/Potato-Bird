@@ -1,10 +1,31 @@
 import pygame_menu
-import Settings
 import pygame as pg
 from pygame._sdl2.video import Renderer, Texture, Image
+import Settings
 
 class Configuration:
-    def __init__(self, app):
+    def __init__(self, app, width, height, touchscreen = True):
+
+        self.app = app
+        self.screen_size = (width,height)
+        self.surface = pg.Surface(self.screen_size)
+        self.menu = pygame_menu.Menu('Configuration',
+                                        self.screen_size[0],
+                                        self.screen_size[1],
+                                        mouse_enabled=True,
+                                        surface = self.surface,
+                                        screen_dimension = self.screen_size,
+                                        enabled = False,
+                                        touchscreen=touchscreen)
+        # def are_you_a_god(text):
+        #     pass
+
+        # self.menu.add.text_input('GodMode password :', password=True,onchange=are_you_a_god)
+        def set_speed_multiplier(multiplier):
+            self.app.speed=Settings.SPEED*multiplier
+            pass
+        self.menu.add.range_slider('Speed offset', 1,(1.0,10.0), 0.1, onchange=set_speed_multiplier)
+        # self.menu.add.selector('Sound :', [('On', True), ('Off', False)], onchange=set_sound)
         def set_sound(on):
             if on:
                 print('PotatoBird : unmute')
@@ -14,26 +35,8 @@ class Configuration:
                 print('PotatoBird : mute')
                 self.app.mute()
                 pg.mixer.pause()
-
-        self.app = app
-        self.screen_size = (Settings.WIN_W,Settings.WIN_H)
-        scaled_screen = (Settings.WIN_W*self.app.sprite_handler.scale,Settings.WIN_H*self.app.sprite_handler.scale)
-        self.surface = pg.Surface(scaled_screen)
-        self.menu = pygame_menu.Menu('Configuration',
-                                        scaled_screen[0],
-                                        scaled_screen[1],
-                                        mouse_enabled=True,
-                                        surface = self.surface,
-                                        screen_dimension = scaled_screen,
-                                        enabled = False,
-                                        touchscreen=Settings.platform=='android')
-        def are_you_a_god(text):
-            print(text)
-
-        self.menu.add.text_input('GodMode password :', password=False,onchange=are_you_a_god)
-        # self.menu.add.range_slider()
-        # self.menu.add.selector('Sound :', [('On', True), ('Off', False)], onchange=set_sound)
         self.menu.add.toggle_switch('Sound :',default=True,onchange=set_sound)
+        self.menu.add.toggle_switch('Dark mode :',default=False,onchange=self.app.set_dark_mode)
         self.menu.add.button('Play', self.disable)
         self.menu.add.button('Quit', lambda : pg.event.post(pg.event.Event(pg.QUIT)))
 

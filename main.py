@@ -23,22 +23,24 @@ class App:
         pg.init()
         pg.mixer.init()
         self.dt = 0.0
+        self.speed = Settings.SPEED
         screen_info = pg.display.Info()
         self.window = Window(title='flap.py', size=(screen_info.current_w,screen_info.current_h), fullscreen=Settings.FULLSCREEN)
         self.window.set_icon(pg.image.load(os.path.join(Settings.ASSETS_DIR_PATH,'favicon.png')))
         self.renderer = Renderer(self.window)
         self.sprite_handler = SpriteHandler(self)
-        self.configuration = Configuration(self)
+        self.configuration = Configuration(self, Settings.WIN_W,Settings.WIN_H)
         self.sound_handler = SoundHandler(Settings.AUDIO_DIR_PATH)
-        self.renderer.scale = (self.sprite_handler.scale, self.sprite_handler.scale)
         self.clock = pg.time.Clock()
-        self.font = pg.font.SysFont('Verdana', Settings.FONT_SIZE//2)
-        self.fps_size = (Settings.FONT_SIZE * 13, Settings.FONT_SIZE//2)
-        self.speed = Settings.SPEED
+        self.font = pg.font.SysFont('Verdana', Settings.FONT_SIZE)
+        self.fps_size = (Settings.FONT_SIZE * 13, Settings.FONT_SIZE)
         self.running = True
         self.display_fps = False
         self.background = False
         
+    def set_dark_mode(self,on):
+        self.sprite_handler.set_dark_mode(on)
+
     def mute(self):
         self.sound_handler.mute()
 
@@ -99,7 +101,7 @@ class App:
                         self.sprite_handler.update_speed(self.speed)
                         pg.event.post(pg.event.Event(Settings.EVENT_SOUND, sound = 'swoosh'))
             else:
-                self.configuration.update(events)
+                self.configuration.update([e])
 
     def run(self):
         while self.running:
