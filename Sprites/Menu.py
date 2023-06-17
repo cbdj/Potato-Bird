@@ -21,15 +21,15 @@ class Menu(SpriteUnit):
         surface.blit(get_ready, (pos_x-get_ready.get_width()//2, pos_y-get_ready.get_height()//2))
         pos_y -= 2*title.get_height()
         surface.blit(title, (pos_x-title.get_width()//2, pos_y-title.get_height()//2))
-        # Building arrows
-        gfx.box(surface, (x - 5*grey_bird.get_width()//2, y-grey_bird.get_height()//2, grey_bird.get_width(), grey_bird.get_height()), (255,0,0))
-        gfx.box(surface, (x + 3*grey_bird.get_width()//2, y-grey_bird.get_height()//2, grey_bird.get_width(), grey_bird.get_height()), (255,0,0))
-        gfx.filled_trigon(surface,x - 3*grey_bird.get_width()//2, y-grey_bird.get_height()//2, x-grey_bird.get_width()//2,y ,x - 3*grey_bird.get_width()//2, y +grey_bird.get_height()//2, (255,0,0))
-        gfx.filled_trigon(surface,x + 3*grey_bird.get_width()//2, y-grey_bird.get_height()//2, x + grey_bird.get_width()//2, y ,x + 3*grey_bird.get_width()//2, y +grey_bird.get_height()//2, (255,0,0))
-        # Building arrows legends
         tap = Exfont.text_speech(half_font, 'TAP!', 'white', True, 1, 'black')
-        surface.blit(tap, (x - 3*grey_bird.get_width()//2 - tap.get_width(), y-grey_bird.get_height()//2+tap.get_height()//2))
-        surface.blit(tap, (x  + 3*grey_bird.get_width()//2, y-grey_bird.get_height()//2+tap.get_height()//2))
+        # Building arrows
+        gfx.box(surface, (x - grey_bird.get_width() - tap.get_width(), y-tap.get_height()//2, tap.get_width(), tap.get_height()), (255,0,0))
+        gfx.filled_trigon(surface,x - grey_bird.get_width(), y-grey_bird.get_height()//2, x-grey_bird.get_width()//2,y ,x - grey_bird.get_width() , y +grey_bird.get_height()//2, (255,0,0))
+        gfx.box(surface, (x + grey_bird.get_width(), y-tap.get_height()//2, tap.get_width(), tap.get_height()), (255,0,0))
+        gfx.filled_trigon(surface,x + grey_bird.get_width(), y-grey_bird.get_height()//2, x + grey_bird.get_width()//2, y ,x + grey_bird.get_width(), y +grey_bird.get_height()//2, (255,0,0))
+        # Building arrows legends
+        surface.blit(tap, (x - grey_bird.get_width() - tap.get_width(), y-tap.get_height()//2))
+        surface.blit(tap, (x  + grey_bird.get_width(), y-tap.get_height()//2))
         super().__init__(handler, surface, x, y)
 
    

@@ -12,11 +12,13 @@ class Configuration:
         self.menu = pygame_menu.Menu('Configuration',
                                         self.screen_size[0],
                                         self.screen_size[1],
+                                        theme = pygame_menu.Theme(title_font_size = 100, widget_font_size = 80),
                                         mouse_enabled=True,
                                         surface = self.surface,
                                         screen_dimension = self.screen_size,
                                         enabled = False,
-                                        touchscreen=touchscreen)
+                                        touchscreen=touchscreen,
+                                        touchscreen_motion_selection=touchscreen)
         # def are_you_a_god(text):
         #     pass
 
