@@ -3,7 +3,7 @@ from Sprites.Background import Background
 from Sprites.Base import Base
 from Sprites.Pipe import Pipe
 from Sprites.Bird import Bird
-from Sprites.Score import Score
+from Sprites.Score import Score, Best
 from Sprites.Menu import Menu
 from Sprites.Button import Button
 from Sprites.SpriteUnit import SpriteUnit
@@ -63,25 +63,26 @@ class SpriteHandler:
         if Settings.USE_OFFICIAL_ASSETS:
             self.menu = SpriteUnit(self, self.images['message'], Settings.WIN_W / 2, Settings.WIN_H / 2)
         else:
-            self.menu = Menu(self, Settings.WIN_W / 2, Settings.WIN_H / 2, Settings.TITLE, self.images[Settings.BIRD_COLOR + 'bird-midflap'], Settings.FONT_SIZE)
+            self.menu = Menu(self, Settings.WIN_W / 2, Settings.WIN_H / 2, Settings.TITLE, self.images[Settings.BIRD_COLOR + 'bird-midflap'], Settings.FONT_SIZE, scale)
         def show_leaderboard():
             if Settings.platform == 'android':
                 self.app.playgamesservices.show_leaderboard()
                 pass
-        self.leaderboard_button = Button(self, self.images['leaderboard_button'], self.images['leaderboard_button_pressed'], Settings.WIN_W / 2, 2*Settings.WIN_H /3, show_leaderboard)
+        self.leaderboard_button = Button(self, self.images['cup'], self.images['cup'],self.images['cup'].get_width()//2, self.images['cup'].get_height()//2, show_leaderboard)
+        self.best = Best(self, self.leaderboard_button.x + self.leaderboard_button.image.get_rect().w, self.leaderboard_button.y, Settings.base_path, Settings.FONT_SIZE, scale)
+        if Settings.platform == 'android':
+            self.app.playgamesservices.get_remote_best(self.best.set_remote_best)
         def show_settings():
             self.app.configuration.enable()
-        self.show_settings_button = Button(self, self.images['settings'], self.images['settings'], Settings.WIN_W - self.images['settings'].get_width(), self.images['settings'].get_height(), show_settings)
+        self.show_settings_button = Button(self, self.images['settings'], self.images['settings'], Settings.WIN_W - self.images['settings'].get_width()//2, self.images['settings'].get_height()//2, show_settings)
         self._gameover = SpriteUnit(self,self.images['gameover'], Settings.WIN_W / 2, Settings.WIN_H / 2)
-        self.score=Score(self, Settings.WIN_W / 2, 2*Settings.FONT_SIZE, Settings.FONT_SIZE)
-        if Settings.platform == 'android':
-            self.app.playgamesservices.get_remote_best(self.score.set_remote_best)
+        self.score=Score(self, Settings.WIN_W / 2, 2*Settings.FONT_SIZE, Settings.FONT_SIZE, scale)
 
         # Creating groups
         self.group_background = pg.sprite.GroupSingle(self.background)
         self.group_collide = pg.sprite.Group(self.pipes, self.base) # special group for sprites that Bird can collide on
         self.group_bird = pg.sprite.GroupSingle(self.bird)
-        self.group_foreground = pg.sprite.Group(self.score)
+        self.group_foreground = pg.sprite.Group(self.score, self.score, self.leaderboard_button)
         
         self._started = False
 
@@ -100,9 +101,7 @@ class SpriteHandler:
             pipe.reset()
             pipe_reversed.reset()
         self.group_foreground.empty()
-        self.group_foreground.add(self.menu, self.score, self.show_settings_button)
-        if Settings.platform == 'android':
-            self.group_foreground.add(self.leaderboard_button)
+        self.group_foreground.add(self.menu, self.score, self.leaderboard_button, self.best, self.show_settings_button)
         self.update_speed(0)
         self.app.dt=0.0
         self.group_background.update()
@@ -183,6 +182,8 @@ class SpriteHandler:
             if pipe1.x < self.bird.x and not pipe1.point_given:
                 pg.event.post(pg.event.Event(Settings.EVENT_SOUND, sound = 'point'))
                 self.score.increment()
+                if self.score.get() > self.best.get():
+                    self.best.set(self.score.get())
                 pipe1.point_given = True
                 break
             elif pipe1.x > self.bird.x:
@@ -247,7 +248,7 @@ class SpriteHandler:
             self.app.ad_manager.reload()
         self.score.reset()
         self.group_foreground.empty()
-        self.group_foreground.add(self.score)
+        self.group_foreground.add(self.score, self.leaderboard_button, self.best)
         self.update_speed(self.app.speed)
         pg.time.set_timer(Settings.EVENT_DAY_NIGHT, Settings.DAY_NIGHT_TIME_MS)
 
@@ -259,15 +260,15 @@ class SpriteHandler:
     def game_over(self):
         self.stop()
         self.group_foreground.add(self._gameover)
-        self.score.save_best()
+        self.best.save()
         if Settings.platform=='android':
-            self.app.playgamesservices.submit_score(self.score.score)
-            if self.score.score < self.score.best:
+            self.app.playgamesservices.submit_score(self.score.get())
+            if self.score.get() < self.best.get():
                 # get punished
                 self.app.ad_manager.may_show()
 
     def quit(self):
-        self.score.save_best()
+        self.best.save()
 
     def set_dark_mode(self,on):
         self.background.set_dark_mode(on)

@@ -24,9 +24,9 @@ class Configuration:
 
         # self.menu.add.text_input('GodMode password :', password=True,onchange=are_you_a_god)
         def set_speed_multiplier(multiplier):
-            self.app.speed=Settings.SPEED*multiplier
+            self.app.speed=int(Settings.SPEED*multiplier)
             pass
-        self.menu.add.range_slider('Speed offset', 1,(1.0,10.0), 0.1, onchange=set_speed_multiplier)
+        self.menu.add.range_slider('Speed multiplier', 1.0,(1.0,2.0), 0.1, onchange=set_speed_multiplier, width = 600)
         # self.menu.add.selector('Sound :', [('On', True), ('Off', False)], onchange=set_sound)
         def set_sound(on):
             if on:

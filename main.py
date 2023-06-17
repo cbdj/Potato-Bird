@@ -37,7 +37,7 @@ class App:
         self.running = True
         self.display_fps = False
         self.background = False
-        
+
     def set_dark_mode(self,on):
         self.sprite_handler.set_dark_mode(on)
 
@@ -67,7 +67,7 @@ class App:
         self.renderer.present()
 
     def check_events(self):
-        events = pg.event.get()
+        events = pg.event.get(eventtype=[259,262,257,Settings.EVENT_SOUND,Settings.EVENT_AD])
         for e in events:
             if e.type == 259 :#pg.APP_WILLENTERBACKGROUND
                 print("pygame APP_WILLENTERBACKGROUND")
@@ -82,7 +82,11 @@ class App:
             elif e.type == Settings.EVENT_AD:
                 print('EVENT_AD')
                 self.ad_manager.on_timeout()
-            elif not self.configuration.is_enabled():
+        events = pg.event.get()
+        if self.configuration.is_enabled():
+            self.configuration.update(events)
+        else:
+            for e in events:
                 if e.type == pg.KEYDOWN:
                     if e.key == pg.K_ESCAPE:
                         self.running = False
@@ -95,13 +99,11 @@ class App:
                 elif e.type == pg.MOUSEBUTTONUP:
                     self.sprite_handler.on_mouse_unpress()
                 elif e.type == Settings.EVENT_DAY_NIGHT:
-                    if self.sprite_handler._started : 
+                    if self.sprite_handler._started and not self.sprite_handler.bird.hit: 
                         self.sprite_handler.background.toggle_day_night()
                         self.speed += Settings.SPEED_INCREASE_FACTOR
                         self.sprite_handler.update_speed(self.speed)
                         pg.event.post(pg.event.Event(Settings.EVENT_SOUND, sound = 'swoosh'))
-            else:
-                self.configuration.update([e])
 
     def run(self):
         while self.running:

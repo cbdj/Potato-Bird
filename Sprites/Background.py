@@ -20,6 +20,9 @@ class Background(Base):
         self.day = not self.day
 
     def reset(self):
+        if self.dark_mode:
+            self.update_image(self.night_image)
+            return
         self.day = True
         self.update_image(self.day_image)
 
