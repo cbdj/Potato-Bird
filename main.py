@@ -25,7 +25,7 @@ class App:
         pg.init()
         pg.mixer.init()
         self.dt = 0.0
-        self.speed = Settings.SPEED
+        self.speed = int(Settings.SPEED*Settings.speed_multiplier)
         screen_info = pg.display.Info()
         size=(screen_info.current_w,screen_info.current_h)
         self.window = Window(title='flap.py', size=size, fullscreen=Settings.FULLSCREEN)

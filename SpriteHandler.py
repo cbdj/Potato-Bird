@@ -104,6 +104,7 @@ class SpriteHandler:
         self.group_foreground.add(self.menu, self.score, self.leaderboard_button, self.best, self.show_settings_button)
         self.update_speed(0)
         self.app.dt=0.0
+        self.app.speed = int(Settings.SPEED*Settings.speed_multiplier)
         self.group_background.update()
         self.group_collide.update()
         self.group_bird.update()
