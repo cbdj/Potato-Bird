@@ -49,6 +49,7 @@ class Bird(SpriteUnit):
 
     def update(self):
         self.translate() 
+        return
         if self.dead:
             return
         if not self.hit and pg.sprite.spritecollideany(self, self.handler.group_collide, pg.sprite.collide_mask):

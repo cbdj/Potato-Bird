@@ -40,6 +40,7 @@ class Best(Score):
     def __init__(self, handler, x, y, save_path, font_size, scale = 1.0):
         super().__init__(handler, x, y, font_size, scale)
         self.remote_best=0
+        self.orig_w = self.image.get_rect().w
         self.score_path = os.path.join(save_path, 'record.txt')
         print(f'Record file path : {os.path.abspath(self.score_path)}')
         if os.path.exists(self.score_path):
@@ -49,14 +50,15 @@ class Best(Score):
     def update(self):
         if self.remote_best > self.score:
             self.set(self.remote_best)
+        super().update()
 
     def update_slow(self):
         # Specific treatment for align left
         new_image = self._get_image(self.handler)
-        offset = new_image.get_rect().w - self.image.get_rect().w
+        offset = new_image.get_rect().w - self.orig_w
         self.update_image(new_image)
         if offset > 0:
-            self.x += offset//2
+            self.x = self.orig_x + offset//2
 
     def reset(self):
         pass
