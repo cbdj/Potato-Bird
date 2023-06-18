@@ -45,14 +45,18 @@ class Best(Score):
         if os.path.exists(self.score_path):
             with open(self.score_path,'r') as score_file:
                 self.set(int(score_file.read()))
-        
+                
+    def update(self):
+        if self.remote_best > self.score:
+            self.set(self.remote_best)
+
     def update_slow(self):
-        # Sêcific treatment for align left
+        # Specific treatment for align left
         new_image = self._get_image(self.handler)
         offset = new_image.get_rect().w - self.image.get_rect().w
         self.update_image(new_image)
         if offset > 0:
-            self.x += offset
+            self.x += offset//2
             self.image.get_rect().centerx += offset
 
     def reset(self):
@@ -60,9 +64,6 @@ class Best(Score):
 
     def set_remote_best(self, best):
         self.remote_best = best
-        if best > self.score:
-            self.set(best)
-
 
     def save(self):
         with open(self.score_path,'w') as score_file:
