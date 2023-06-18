@@ -57,7 +57,6 @@ class Best(Score):
         self.update_image(new_image)
         if offset > 0:
             self.x += offset//2
-            self.image.get_rect().centerx += offset
 
     def reset(self):
         pass
