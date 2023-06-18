@@ -13,8 +13,10 @@ from Configuration import Configuration
 import pygame as pg
 # import pygame.freetype as ft
 import Exfont 
+import random
+from pygame._sdl2.video import Texture
 
-__version__ = "1.1.5"
+__version__ = "1.1.6"
 class App:
     def __init__(self):
         if Settings.platform=='android':
@@ -25,9 +27,11 @@ class App:
         self.dt = 0.0
         self.speed = Settings.SPEED
         screen_info = pg.display.Info()
-        self.window = Window(title='flap.py', size=(screen_info.current_w,screen_info.current_h), fullscreen=Settings.FULLSCREEN)
+        size=(screen_info.current_w,screen_info.current_h)
+        self.window = Window(title='flap.py', size=size, fullscreen=Settings.FULLSCREEN)
         self.window.set_icon(pg.image.load(os.path.join(Settings.ASSETS_DIR_PATH,'favicon.png')))
-        self.renderer = Renderer(self.window)
+        self.renderer = Renderer(self.window, target_texture = True)
+        self.target = Texture(self.renderer, size=size, target = True)
         self.sprite_handler = SpriteHandler(self)
         self.configuration = Configuration(self, Settings.WIN_W,Settings.WIN_H)
         self.sound_handler = SoundHandler(Settings.AUDIO_DIR_PATH)
@@ -37,6 +41,9 @@ class App:
         self.running = True
         self.display_fps = False
         self.background = False
+        
+        self.shake_intensity = 0
+        self.shake_duration = 0
 
     def set_dark_mode(self,on):
         self.sprite_handler.set_dark_mode(on)
@@ -52,37 +59,45 @@ class App:
         self.dt = self.clock.tick(Settings.FPS) * 0.001
 
     def draw_fps(self):
-        # img = Image(Texture.from_surface(self.renderer, Exfont.text_speech(self.font, f'{self.clock.get_fps() :.0f} FPS | {self.sprite_handler.count_sprites()} SPRITES','green', True, 1, 'black')))
-        img = Image(Texture.from_surface(self.renderer, self.font.render(f'{self.clock.get_fps() :.0f} FPS | {self.sprite_handler.count_sprites()} SPRITES', True, 'green')))
-        img.draw(img.get_rect(),img.get_rect())
-        
+        fps_texture = Texture.from_surface(self.renderer, self.font.render(f'{self.clock.get_fps() :.0f} FPS | {self.sprite_handler.count_sprites()} SPRITES', True, 'green'))
+        fps_texture.draw(fps_texture.get_rect(),fps_texture.get_rect())
 
     def draw(self):
         self.renderer.clear()
+        self.renderer.target = self.target 
         self.sprite_handler.draw()
         if self.display_fps:
             self.draw_fps()
         if self.configuration.is_enabled():
             self.configuration.draw(self.renderer)
+        self.renderer.target = None
+        dest_rect = self.target.get_rect()
+        if self.shake_duration > 0:
+            self.shake_duration -= 1
+            offset_x = random.randint(-self.shake_intensity, self.shake_intensity)
+            offset_y = random.randint(-self.shake_intensity, self.shake_intensity)
+            dest_rect.x,  dest_rect.y= dest_rect.x + offset_x, dest_rect.y + offset_y
+        self.target.draw(self.target.get_rect(), dest_rect)
         self.renderer.present()
+        
+        # self.screen_renderer.present()
 
     def check_events(self):
-        events = pg.event.get(eventtype=[259,262,257,Settings.EVENT_SOUND,Settings.EVENT_AD])
+        super_events_types = (pg.QUIT,pg.APP_WILLENTERBACKGROUND,pg.APP_DIDENTERFOREGROUND,pg.APP_TERMINATING,Settings.EVENT_SOUND,Settings.EVENT_AD)
+        events = pg.event.get(eventtype=super_events_types)
         for e in events:
-            if e.type == 259 :#pg.APP_WILLENTERBACKGROUND
-                print("pygame APP_WILLENTERBACKGROUND")
+            if e.type == pg.APP_WILLENTERBACKGROUND:
                 self.background = True
-            elif e.type == 262: #pg.APP_DIDENTERFOREGROUND
-                print("pygame APP_DIDENTERFOREGROUND")
+            elif e.type == pg.APP_DIDENTERFOREGROUND:
                 self.background = False
-            elif e.type == pg.QUIT or e.type == 257: #pg.APP_TERMINATING
+            if e.type == pg.QUIT or e.type == pg.APP_TERMINATING:
                 self.running = False
             elif e.type == Settings.EVENT_SOUND:
                 self.sound_handler.play(e.sound)
             elif e.type == Settings.EVENT_AD:
                 print('EVENT_AD')
                 self.ad_manager.on_timeout()
-        events = pg.event.get()
+        events = pg.event.get(exclude=super_events_types)
         if self.configuration.is_enabled():
             self.configuration.update(events)
         else:
@@ -104,6 +119,9 @@ class App:
                         self.speed += Settings.SPEED_INCREASE_FACTOR
                         self.sprite_handler.update_speed(self.speed)
                         pg.event.post(pg.event.Event(Settings.EVENT_SOUND, sound = 'swoosh'))
+                elif e.type == Settings.SHAKE_SCREEN:
+                    self.shake_intensity = e.intensity
+                    self.shake_duration = e.duration
 
     def run(self):
         while self.running:

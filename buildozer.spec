@@ -37,7 +37,7 @@ version.filename = %(source.dir)s/main.py
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3,pygame-ce
+requirements = python3,pygame-ce,typing_extensions,pygame_menu,
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes

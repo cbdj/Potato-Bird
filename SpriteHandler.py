@@ -76,7 +76,7 @@ class SpriteHandler:
             self.app.configuration.enable()
         self.show_settings_button = Button(self, self.images['settings'], self.images['settings'], Settings.WIN_W - self.images['settings'].get_width()//2, self.images['settings'].get_height()//2, show_settings)
         self._gameover = SpriteUnit(self,self.images['gameover'], Settings.WIN_W / 2, Settings.WIN_H / 2)
-        self.score=Score(self, Settings.WIN_W / 2, 2*Settings.FONT_SIZE, Settings.FONT_SIZE, scale)
+        self.score=Score(self, Settings.WIN_W / 2, Settings.WIN_W / 5, Settings.FONT_SIZE, scale)
 
         # Creating groups
         self.group_background = pg.sprite.GroupSingle(self.background)
@@ -248,7 +248,7 @@ class SpriteHandler:
             self.app.ad_manager.reload()
         self.score.reset()
         self.group_foreground.empty()
-        self.group_foreground.add(self.score, self.leaderboard_button, self.best)
+        self.group_foreground.add(self.score, self.leaderboard_button, self.best, self.show_settings_button)
         self.update_speed(self.app.speed)
         pg.time.set_timer(Settings.EVENT_DAY_NIGHT, Settings.DAY_NIGHT_TIME_MS)
 

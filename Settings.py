@@ -51,14 +51,15 @@ PARTICLES_DIR_PATH = os.path.join(ASSETS_DIR_PATH , 'particles')
 AUDIO_DIR_PATH = os.path.join(ASSETS_DIR_PATH, 'audio')
 BIRD_COLOR = 'yellow'
 PIPE_DENSITY = 6
-BUMP_SPEED = 700
+BUMP_SPEED = 1200
 FONT_SIZE = 40
 SPEED = 500 # initial pipe and base speed # parameter that can be modified in configuration menu
 SPEED_INCREASE_FACTOR = 50 # speed increase at each day/night event
 DAY_NIGHT_TIME_MS = 10000
 EVENT_DAY_NIGHT = pg.event.custom_type()
-BIRD_MASS_KG = 0.2
+BIRD_MASS_KG = 0.4
 
 AD_TIME_MS = 30000
 EVENT_AD = pg.event.custom_type()
 EVENT_SOUND = pg.event.custom_type()
+SHAKE_SCREEN = pg.event.custom_type()

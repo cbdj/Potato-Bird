@@ -13,7 +13,7 @@ class Pygame2Recipe(CompiledComponentsPythonRecipe):
         not part of the build. It's usable, but not complete.
     """
 
-    # version = '2.4.0'
+    # version = '2.3.0'
     # url = 'https://github.com/pygame/pygame/archive/{version}.tar.gz'
     url = 'https://github.com/cbdj/pygame-ce/archive/refs/tags/fix_android3.tar.gz'
 
