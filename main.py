@@ -16,7 +16,7 @@ import Exfont
 import random
 from pygame._sdl2.video import Texture
 
-__version__ = "1.1.6"
+__version__ = "1.1.7"
 class App:
     def __init__(self):
         if Settings.platform=='android':
@@ -25,7 +25,7 @@ class App:
         pg.init()
         pg.mixer.init()
         self.dt = 0.0
-        self.speed = int(Settings.SPEED*Settings.speed_multiplier)
+        self.speed = Settings.SPEED
         screen_info = pg.display.Info()
         size=(screen_info.current_w,screen_info.current_h)
         self.window = Window(title='flap.py', size=size, fullscreen=Settings.FULLSCREEN)
