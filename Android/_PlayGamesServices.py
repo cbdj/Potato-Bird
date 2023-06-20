@@ -125,6 +125,15 @@ class _PlayGamesServices():
             return
             
         for name in self.leaderboards.keys():
+            if name not in self.submit_candidates.keys():
+                self.submit_candidates[name] = None
+        for name, score in self.submit_candidates.items():
+            if score is not None:
+                self.submit_candidates[name] = None
+                self._submit_score(name, score)
+                return
+                
+        for name in self.leaderboards.keys():
             if name not in self.remote_bests.keys():
                 self.remote_bests[name] = None
         for name, best in self.remote_bests.items():
@@ -132,19 +141,11 @@ class _PlayGamesServices():
                 self.getting_remote_best_current_name = name
                 self._get_remote_best(name)
                 return
+        self.getting_remote_best_current_name = None
         for name, callback in self.get_remote_best_callbacks.items():
             if callback is not None:
                 callback(self.remote_bests[name])
             self.get_remote_best_callbacks[name] = None
-                
-        self.getting_remote_best_current_name = None
-        for name in self.leaderboards.keys():
-            if name not in self.submit_candidates.keys():
-                self.submit_candidates[name] = None
-        for name, score in self.submit_candidates.items():
-            if score is not None:
-                self._submit_score(name, score)
-                self.submit_candidates[name] = None
                 
     @run_on_ui_thread
     def _initialize(self):
@@ -226,18 +227,19 @@ class _PlayGamesServices():
     def _submit_score(self, leaderboard_name, score):
         print("PlayGamesServices : BEG _submit_score")
         JavaBridge.PlayGames.getLeaderboardsClient(self.activity).submitScore(self.leaderboards[leaderboard_name], score);
-        print(f"PlayGamesServices : {self.player.getDisplayName()} submitted a new high score : {score}")
+        print(f"PlayGamesServices : {self.player.getDisplayName()} submitted a new score : {leaderboard_name} : {score}")
+        self.synchronize()
         print("PlayGamesServices : END _submit_score")
 
     def submit_score(self, score, leaderboard_name = None):
-        print("PlayGamesServices : BEG submit_score {leaderboard_name}")
+        print(f"PlayGamesServices : BEG submit_score {leaderboard_name}")
         if leaderboard_name is not None:
             self.submit_candidates[leaderboard_name] = score
         else:
             for key in self.submit_candidates.keys():
                 self.submit_candidates[key] = score
         self.synchronize()
-        print("PlayGamesServices : END submit_score {leaderboard_name}")
+        print(f"PlayGamesServices : END submit_score {leaderboard_name}")
         
     def _on_show_leaderboard_failure(self, e):
         print(f"PlayGamesServices :_on_show_leaderboard_failure : {e.getMessage()}")
