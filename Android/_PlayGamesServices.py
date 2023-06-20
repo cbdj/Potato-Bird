@@ -134,7 +134,7 @@ class _PlayGamesServices():
                 return
         for name, callback in self.get_remote_best_callbacks.items():
             if callback is not None:
-                callback()
+                callback(self.remote_bests[name])
             self.get_remote_best_callbacks[name] = None
                 
         self.getting_remote_best_current_name = None
