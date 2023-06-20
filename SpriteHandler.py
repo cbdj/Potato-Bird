@@ -66,12 +66,15 @@ class SpriteHandler:
             self.menu = Menu(self, Settings.WIN_W / 2, Settings.WIN_H / 2, Settings.TITLE, self.images[Settings.BIRD_COLOR + 'bird-midflap'], Settings.FONT_SIZE, scale)
         def show_leaderboard():
             if Settings.platform == 'android':
-                self.app.playgamesservices.show_leaderboard()
+                self.app.playgamesservices.show_leaderboards()
                 pass
         self.leaderboard_button = Button(self, self.images['cup'], self.images['cup'],self.images['cup'].get_width()//2, self.images['cup'].get_height()//2, show_leaderboard)
         self.best = Best(self, self.leaderboard_button.x + self.leaderboard_button.image.get_rect().w, self.leaderboard_button.y, Settings.base_path, Settings.FONT_SIZE, scale)
         if Settings.platform == 'android':
-            self.app.playgamesservices.get_remote_best(self.best.set_remote_best)
+            def get_leaderboards_names_cb(leaderboards):
+                if len(leaderboards) > 0:
+                    self.app.playgamesservices.get_remote_best(leaderboards[-1],self.best.set_remote_best)
+            self.app.playgamesservices.get_leaderboards_names(get_leaderboards_names_cb)
         def show_settings():
             self.app.configuration.enable()
         self.show_settings_button = Button(self, self.images['settings'], self.images['settings'], Settings.WIN_W - self.images['settings'].get_width()//2, self.images['settings'].get_height()//2, show_settings)

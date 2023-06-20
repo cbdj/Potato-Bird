@@ -16,12 +16,12 @@ import Exfont
 import random
 from pygame._sdl2.video import Texture
 
-__version__ = "1.1.8"
+__version__ = "1.2.0"
 class App:
     def __init__(self):
         if Settings.platform=='android':
             self.ad_manager = AdManager()
-            self.playgamesservices = PlayGamesServices(Settings.LEADERBOARD_ID)
+            self.playgamesservices = PlayGamesServices()
         pg.init()
         pg.mixer.init()
         self.dt = 0.0
@@ -47,6 +47,9 @@ class App:
 
     def set_dark_mode(self,on):
         self.sprite_handler.set_dark_mode(on)
+        
+    def set_show_fps(self,on):
+        self.display_fps = on
 
     def mute(self):
         self.sound_handler.mute()

@@ -21,7 +21,6 @@ if platform=="android":
     base_path=os.path.abspath(f"/data/data/{package_domain}.{package_name}/files/app/")
     INTERSTITIAL_ID="ca-app-pub-4493613666001226/1483234688"
     BANNER_ID="ca-app-pub-4493613666001226/5140290547"
-    LEADERBOARD_ID="CgkIzdaAt-geEAIQAg"
     
 elif platform=="win":
     try:
@@ -40,7 +39,7 @@ WIN_H = 0
 # CONSTANTS
 TITLE = 'Potato Bird'
 FULLSCREEN= platform == "android"
-FPS = 165
+FPS = 120
 USE_OFFICIAL_ASSETS = False
 if USE_OFFICIAL_ASSETS : 
     ASSETS_DIR_PATH = os.path.join(base_path,'official_assets')

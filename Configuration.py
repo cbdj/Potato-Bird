@@ -38,6 +38,7 @@ class Configuration:
                 pg.mixer.pause()
         self.menu.add.toggle_switch('Sound :',default=True,onchange=set_sound)
         self.menu.add.toggle_switch('Dark mode :',default=False,onchange=self.app.set_dark_mode)
+        self.menu.add.toggle_switch('Show FPS :',default=False,onchange=self.app.set_show_fps)
         def on_play():
             pg.event.post(pg.event.Event(Settings.EVENT_SOUND, sound = 'button_press'))
             self.disable()
