@@ -54,6 +54,8 @@ class Configuration:
             if e.type == pg.KEYDOWN:
                 if e.key == pg.K_ESCAPE:
                     self.disable()
+                elif e.key == pg.K_AC_BACK:
+                    pg.event.post(pg.event.Event(pg.QUIT))
         
     def draw(self, renderer : Renderer):
         self.menu.draw(self.surface)

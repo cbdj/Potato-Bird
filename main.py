@@ -6,6 +6,7 @@ import Settings
 if Settings.platform=='android':
     from AdManager import AdManager 
     from Android.PlayGamesServices import PlayGamesServices
+    from android import loadingscreen
 from pygame._sdl2.video import Window, Renderer, Texture, Image
 from SpriteHandler import SpriteHandler
 from SoundHandler import SoundHandler
@@ -15,8 +16,9 @@ import pygame as pg
 import Exfont 
 import random
 from pygame._sdl2.video import Texture
+import pygame.gfxdraw as gfx
 
-__version__ = "1.2.2"
+__version__ = "1.2.3"
 class App:
     def __init__(self):
         if Settings.platform=='android':
@@ -36,15 +38,17 @@ class App:
         self.configuration = Configuration(self, Settings.WIN_W,Settings.WIN_H)
         self.sound_handler = SoundHandler(Settings.AUDIO_DIR_PATH)
         self.clock = pg.time.Clock()
-        self.font = pg.font.SysFont('Verdana', Settings.FONT_SIZE)
+        self.font = pg.font.Font(None, Settings.FONT_SIZE)
         self.fps_size = (Settings.FONT_SIZE * 13, Settings.FONT_SIZE)
         self.running = True
         self.display_fps = False
         self.background = False
-        
+                
         self.shake_intensity = 0
         self.shake_duration = 0
-
+        if Settings.platform=='android':
+            loadingscreen.hide_loading_screen()
+      
     def set_dark_mode(self,on):
         self.sprite_handler.set_dark_mode(on)
         
@@ -83,8 +87,6 @@ class App:
         self.target.draw(self.target.get_rect(), dest_rect)
         self.renderer.present()
         
-        # self.screen_renderer.present()
-
     def check_events(self):
         super_events_types = (pg.QUIT,pg.APP_WILLENTERBACKGROUND,pg.APP_DIDENTERFOREGROUND,pg.APP_TERMINATING,Settings.EVENT_SOUND,Settings.EVENT_AD)
         events = pg.event.get(eventtype=super_events_types)
@@ -93,7 +95,9 @@ class App:
                 self.background = True
             elif e.type == pg.APP_DIDENTERFOREGROUND:
                 self.background = False
-            if e.type == pg.QUIT or e.type == pg.APP_TERMINATING:
+            elif e.type == pg.QUIT:
+                self.running = False
+            elif e.type == pg.APP_TERMINATING:
                 self.running = False
             elif e.type == Settings.EVENT_SOUND:
                 self.sound_handler.play(e.sound)
@@ -106,8 +110,9 @@ class App:
         else:
             for e in events:
                 if e.type == pg.KEYDOWN:
-                    if e.key == pg.K_ESCAPE:
-                        self.running = False
+                    if e.key == pg.K_ESCAPE or e.key == pg.K_AC_BACK:
+                        if Settings.platform == 'android':
+                            pg.event.post(pg.event.Event(pg.QUIT))
                     if e.key == pg.K_d:
                         self.display_fps = not self.display_fps
                     else:
@@ -129,12 +134,13 @@ class App:
     def run(self):
         while self.running:
             self.check_events()
-            if not self.background:
-                self.update()
-                self.draw()
+            if self.background:
+                continue
+            self.update()
+            self.draw()
         self.sprite_handler.quit()
         pg.mixer.quit()
         pg.quit()
-
+        
 if __name__ == '__main__':
     App().run()

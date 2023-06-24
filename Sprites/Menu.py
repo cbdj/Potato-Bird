@@ -10,8 +10,8 @@ class Menu(SpriteUnit):
     def __init__(self, handler, x, y, title : str, bird : Surface, font_size : int, scale = 1.0):
         x,y=int(x),int(y)
         surface = pg.Surface((2*x,2*y), pg.SRCALPHA)
-        font = pg.font.SysFont('Verdana', font_size)
-        half_font = pg.font.SysFont('Verdana', font_size//2)
+        font = pg.font.Font(None, font_size)
+        half_font = pg.font.Font(None, font_size//2)
         def upscale(surface, scale):
             return pg.transform.scale(surface, (surface.get_rect().w * scale, surface.get_rect().h * scale))
         title = upscale(Exfont.text_speech(font, title, 'white', True, 2, 'black'), scale)

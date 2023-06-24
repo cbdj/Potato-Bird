@@ -14,7 +14,7 @@ class Score(SpriteUnit):
         super().__init__(handler, self._get_image(handler),x,y)
 
     def _get_image(self, handler):
-        surface = pg.font.SysFont('Verdana', self.font_size).render( str(self.score), True, 'white')
+        surface = pg.font.Font(None, self.font_size).render( str(self.score), True, 'white')
         return Image(Texture.from_surface(handler.renderer, upscale(surface,self.scale)))
 
     def update_slow(self):
