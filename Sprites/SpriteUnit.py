@@ -3,7 +3,7 @@ from pygame._sdl2.video import Image, Texture
 from pygame import mask
 
 class SpriteUnit(pg.sprite.Sprite):
-    def __init__(self, handler, image, x, y):
+    def __init__(self, handler, image = None, x = 0, y = 0):
         super().__init__()
         self.handler = handler
         if isinstance(image,Image):
@@ -12,7 +12,8 @@ class SpriteUnit(pg.sprite.Sprite):
             self.mask = mask.from_surface(image)
             self.image = Image(Texture.from_surface(self.handler.renderer, image))
         else:
-            raise "SpriteUnit : Invalid image parameter"
+            self.image = Image(Texture(self.handler, (1,1)))
+            # raise "SpriteUnit : Invalid image parameter"
         self.rect = self.image.get_rect()
         self.orig_rect = self.rect.copy()
         self.orig_x, self.orig_y = x, y

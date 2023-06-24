@@ -41,7 +41,8 @@ class SmokeParticle:
         self.texture.draw(self.src_rect, self.dest_rect)
 
 class Smoke:
-    def __init__(self, renderer, surface, x, y):
+    def __init__(self, renderer, surface, x, y, trigger_speed = 0):
+        self.trigger_speed = trigger_speed
         self.texture = Texture.from_surface(renderer, surface)
         self.alpha = surface.get_alpha()
         self.x = x
@@ -60,7 +61,7 @@ class Smoke:
 
     def update(self):
         self.particles = [i for i in self.particles if i.alive]
-        if self.vel_x or self.vel_y:
+        if self.vel_x >= self.trigger_speed or self.vel_y >= self.trigger_speed:
             self.particles.append(SmokeParticle(self.renderer,self.texture,self.alpha, self.x,self.y, self.vel_x, self.vel_y))
         for particle in self.particles:
             particle.update()

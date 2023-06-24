@@ -16,7 +16,6 @@ import pygame as pg
 import Exfont 
 import random
 from pygame._sdl2.video import Texture
-import pygame.gfxdraw as gfx
 
 __version__ = "1.2.3"
 class App:
@@ -70,8 +69,9 @@ class App:
         fps_texture.draw(fps_texture.get_rect(),fps_texture.get_rect())
 
     def draw(self):
-        self.renderer.clear()
+        # self.renderer.clear()
         self.renderer.target = self.target 
+        self.renderer.clear()
         self.sprite_handler.draw()
         if self.display_fps:
             self.draw_fps()
@@ -87,6 +87,10 @@ class App:
         self.target.draw(self.target.get_rect(), dest_rect)
         self.renderer.present()
         
+    def exit_prompt(self):
+        # ret = messagebox('Warning','Do you really want to exit ?',warn = True, buttons = ('Yes', 'No'), return_button = 0, escape_button = 1)
+        ret=0
+        return ret == 0
     def check_events(self):
         super_events_types = (pg.QUIT,pg.APP_WILLENTERBACKGROUND,pg.APP_DIDENTERFOREGROUND,pg.APP_TERMINATING,Settings.EVENT_SOUND,Settings.EVENT_AD)
         events = pg.event.get(eventtype=super_events_types)
@@ -95,10 +99,8 @@ class App:
                 self.background = True
             elif e.type == pg.APP_DIDENTERFOREGROUND:
                 self.background = False
-            elif e.type == pg.QUIT:
-                self.running = False
-            elif e.type == pg.APP_TERMINATING:
-                self.running = False
+            if e.type == pg.QUIT or e.type == pg.APP_TERMINATING:
+                self.running = not self.exit_prompt()
             elif e.type == Settings.EVENT_SOUND:
                 self.sound_handler.play(e.sound)
             elif e.type == Settings.EVENT_AD:
@@ -111,8 +113,7 @@ class App:
             for e in events:
                 if e.type == pg.KEYDOWN:
                     if e.key == pg.K_ESCAPE or e.key == pg.K_AC_BACK:
-                        if Settings.platform == 'android':
-                            pg.event.post(pg.event.Event(pg.QUIT))
+                        self.running = not self.exit_prompt()
                     if e.key == pg.K_d:
                         self.display_fps = not self.display_fps
                     else:

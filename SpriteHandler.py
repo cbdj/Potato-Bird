@@ -6,6 +6,7 @@ from Sprites.Bird import Bird
 from Sprites.Score import Score, Best
 from Sprites.Menu import Menu
 from Sprites.Button import Button
+from Sprites.Water import Wave
 from Sprites.SpriteUnit import SpriteUnit
 from Particles.Smoke import Smoke
 import pygame as pg
@@ -30,11 +31,11 @@ class SpriteHandler:
         self.extend_world(Settings.WIN_W)
 
         # Creating backgrounds sprites
-        self.background = Background(self, self.images['background-day'], self.images['background-night'], Settings.WIN_W//2, (Settings.WIN_H-self.images['base'].get_height())//2 )
+        self.background = Background(self, self.images['background-day'], self.images['background-night'], Settings.WIN_W//2, Settings.WIN_H//2 )
             
         # Creating Pipes sprites
         h = self.images['pipe-green'].get_height()
-        pipe_default_ypos = Settings.WIN_H + h/2 - self.images['base'].get_height() - h/3
+        pipe_default_ypos = Settings.WIN_H + h/2 - h/3
         pipe_reversed_default_ypos = pipe_default_ypos - h - 4*self.images[Settings.BIRD_COLOR + 'bird-midflap'].get_height()
         self.pipes = []
         x=-self.images['pipe-green'].get_width()/2 # pipes are hidden on the left of the screen by default
@@ -42,7 +43,10 @@ class SpriteHandler:
             self.pipes.append((Pipe(self, self.images['pipe-green'],x, pipe_default_ypos ),Pipe(self, self.images['reversed-pipe-green'],x, pipe_reversed_default_ypos)))
 
         # Creating Base sprite
-        self.base=Base(self, self.images['base'], self.images['base'].get_width()/2, Settings.WIN_H-self.images['base'].get_height()/2)
+        # self.base=Base(self, self.images['base'], self.images['base'].get_width()/2, Settings.WIN_H-self.images['base'].get_height()/2)
+        rect = pg.Rect(self.images['base'].get_width()/2,Settings.WIN_H-self.images['base'].get_height()/2,self.images['base'].get_width(), self.images['base'].get_height())
+        print(rect)
+        self.base=Wave(self, rect)
 
         # Creating Bird sprite
         self.bird = Bird(self, self.images[Settings.BIRD_COLOR + 'bird-downflap'], self.images[Settings.BIRD_COLOR + 'bird-midflap'], self.images[Settings.BIRD_COLOR + 'bird-upflap'], Settings.WIN_W // 2, Settings.WIN_H // 2, Settings.BUMP_SPEED, Settings.BIRD_MASS_KG)
@@ -57,7 +61,7 @@ class SpriteHandler:
                     pixel.b = min(max(0,pixel.b+offset),255)
                     surface.set_at((i,j), pixel)
         offset_color(trainee,60)
-        self.smoke = Smoke(self.renderer, trainee,self.bird.x,self.bird.y)
+        self.smoke = Smoke(self.renderer, trainee,self.bird.x,self.bird.y, Settings.SPEED)
         # Creating menu
         
         if Settings.USE_OFFICIAL_ASSETS:
@@ -83,7 +87,7 @@ class SpriteHandler:
 
         # Creating groups
         self.group_background = pg.sprite.GroupSingle(self.background)
-        self.group_collide = pg.sprite.Group(self.pipes, self.base) # special group for sprites that Bird can collide on
+        self.group_collide = pg.sprite.Group(self.pipes) # special group for sprites that Bird can collide on
         self.group_bird = pg.sprite.GroupSingle(self.bird)
         self.group_foreground = pg.sprite.Group(self.score, self.score, self.leaderboard_button)
         
@@ -121,7 +125,8 @@ class SpriteHandler:
         return uniform(2.0 + offset,7.0 + offset)*self.pipe_width/speed
     
     def update_speed(self, speed):
-        self.base.vel_x = -speed
+        self.base.update_speed(-speed)
+        # self.base.vel_x = -speed
         self.bird.vel_x = -speed/4
         for (pipe, pipe_reversed) in self.pipes :
             pipe.vel_x = -speed
@@ -131,7 +136,7 @@ class SpriteHandler:
 
     def compute_size(self):
         w = self.images['background-day'].get_width()
-        h = self.images['background-day'].get_height() + self.images['base'].get_height()
+        h = self.images['background-day'].get_height()
         return w,h
     
     def load_png(self, path):
@@ -199,6 +204,7 @@ class SpriteHandler:
         self.maybe_requeue_pipes()
         self.group_background.update()
         self.group_collide.update()
+        self.base.update()
         self.group_bird.update()
         self.smoke.set_speed(-3*self.base.vel_x*self.app.dt, -self.bird.vel_y*self.app.dt)
         self.smoke.set_source_position(self.bird.x, self.bird.y)
@@ -208,6 +214,7 @@ class SpriteHandler:
     def draw(self):
         self.group_background.draw(self.renderer)
         self.group_collide.draw(self.renderer)
+        self.base.draw()
         self.smoke.draw()
         self.group_bird.draw(self.renderer)
         self.group_foreground.draw(self.renderer)

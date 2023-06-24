@@ -10,7 +10,7 @@ class Bird(SpriteUnit):
         self.image_middle = Image(Texture.from_surface(self.handler.renderer, image_middle))
         self.image_up = Image(Texture.from_surface(self.handler.renderer, image_up))
         self.image = self.image_middle
-        self.floor = self.handler.base.y - self.handler.base.rect.h//2 - self.image.get_rect().h//2
+        self.floor = self.handler.base.rect.y - self.handler.base.rect.h//2 - self.image.get_rect().h//2
         self.mass = mass
         self.weight = 0.0
         self.dead = False
@@ -49,9 +49,7 @@ class Bird(SpriteUnit):
 
     def update(self):
         self.translate() 
-        if self.dead:
-            return
-        if not self.hit and pg.sprite.spritecollideany(self, self.handler.group_collide, pg.sprite.collide_mask):
+        if not self.dead and not self.hit and pg.sprite.spritecollideany(self, self.handler.group_collide, pg.sprite.collide_mask):
             self.hit = True
             self.vel_x = 0
             self.handler.update_speed(0)
@@ -66,13 +64,17 @@ class Bird(SpriteUnit):
             if not self.dead:
                 pg.event.post(pg.event.Event(Settings.EVENT_SOUND, sound = 'hit'))
                 pg.event.post(pg.event.Event(Settings.SHAKE_SCREEN, duration = 30, intensity = 20))
+                self.handler.base.splash(self.x, self.vel_y/10)
+                self.hit = True
+                self.dead= True
+                self.vel_x = 0
+                self.vel_y = 0
+                self.weight /= 20
+                self.handler.game_over()
                 # self.handler.sounds['hit'].play()
-            self.hit = True
-            self.dead= True
-            self.vel_x = 0
+        if  self.y > Settings.WIN_H - self.image.get_rect().w//4:
             self.vel_y = 0
             self.weight = 0.0
-            self.handler.game_over()
 
     def reset(self):
         super().reset()
