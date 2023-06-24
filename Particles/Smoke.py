@@ -61,7 +61,7 @@ class Smoke:
 
     def update(self):
         self.particles = [i for i in self.particles if i.alive]
-        if self.vel_x >= self.trigger_speed or self.vel_y >= self.trigger_speed:
+        if self.vel_x >= 0 or self.vel_y >= 0:
             self.particles.append(SmokeParticle(self.renderer,self.texture,self.alpha, self.x,self.y, self.vel_x, self.vel_y))
         for particle in self.particles:
             particle.update()

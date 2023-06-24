@@ -63,7 +63,7 @@ class Bird(SpriteUnit):
         if  self.y > self.floor:
             if not self.dead:
                 pg.event.post(pg.event.Event(Settings.EVENT_SOUND, sound = 'hit'))
-                pg.event.post(pg.event.Event(Settings.SHAKE_SCREEN, duration = 30, intensity = 20))
+                pg.event.post(pg.event.Event(Settings.SHAKE_SCREEN, duration = 20, intensity = 10))
                 self.handler.base.splash(self.x, self.vel_y/10)
                 self.hit = True
                 self.dead= True
@@ -71,7 +71,7 @@ class Bird(SpriteUnit):
                 self.vel_y = 0
                 self.weight /= 20
                 self.handler.game_over()
-                # self.handler.sounds['hit'].play()
+
         if  self.y > Settings.WIN_H - self.image.get_rect().w//4:
             self.vel_y = 0
             self.weight = 0.0
