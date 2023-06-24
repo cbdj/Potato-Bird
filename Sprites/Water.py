@@ -17,7 +17,12 @@ class _WaterSpring:
 
     def translate(self, delta):
         self.x = self.orig_x + delta
-
+        
+    def reset(self):
+        self.x = self.orig_x
+        self.vely = 0
+        self.height = self.target_height
+        
     def update(self):
         dh = self.target_height - self.height
         if abs(dh) < 0.01:
@@ -40,9 +45,10 @@ class Wave:
         self.renderer = handler.renderer
         print(rect)
         self.springs = [_WaterSpring(x=i* self.diff, target_height = self.rect.y - self.rect.h/2) for i in range(self.rect.width //  self.diff+2)]
-        self.points = []
+        self.points = [Point(i.x, i.height) for i in self.springs]
         self.vel_x = 0
         self.delta = 0
+        self.triggered = False # optimisation to improve performance. 
 
     def _get_spring_index_for_x_pos(self, x):
         delta = self.rect.x - self.orig_rect.x
@@ -80,9 +86,19 @@ class Wave:
             self.rect.x = self.orig_rect.x
         for i in self.springs:
             i.translate(self.rect.x - self.orig_rect.x)
-
+            
+    def reset(self):
+        for i in self.springs:
+            i.reset()
+        self.rect = self.orig_rect
+        self.update()
+        self.triggered = False
+        
     def update(self):
         self.translate()
+        if not self.triggered :
+            self.points = [Point(self.springs[0].x, self.springs[0].height),Point(self.springs[-1].x, self.springs[-1].height)]
+            return
         for i in self.springs:
             i.update()
         self._spread_wave()
@@ -123,6 +139,7 @@ class Wave:
         index = self._get_spring_index_for_x_pos(x)
         if index is None:
             return None
+        self.triggered = True
         self.springs[index].vely += vel
         return self.springs[index]
 

@@ -102,6 +102,7 @@ class SpriteHandler:
         self.day=True
         self._started = False
         self.background.reset()
+        self.base.reset()
         self.score.reset()
         self.bird.reset()
         for pipe, pipe_reversed in self.pipes:
