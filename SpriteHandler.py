@@ -8,7 +8,6 @@ from Sprites.Menu import Menu
 from Sprites.Button import Button
 from Sprites.Water import Wave
 from Sprites.SpriteUnit import SpriteUnit
-from Particles.Smoke import Smoke
 import pygame as pg
 import pathlib
 from random import randrange, uniform
@@ -26,6 +25,10 @@ class SpriteHandler:
         # Adapting dimensions to screen resolution
         background_sprite_w, background_sprite_h = self.compute_size()
         scale = screen_info.current_h/background_sprite_h
+        Settings.BUMP_SPEED = Settings.BUMP_SPEED * scale
+        Settings.SPEED = Settings.SPEED * scale
+        Settings.SPEED_INCREASE_FACTOR = Settings.SPEED_INCREASE_FACTOR * scale
+        Settings.BIRD_MASS_KG = Settings.BIRD_MASS_KG * scale
         for key, image in self.images.items():
             self.images[key] = pg.transform.scale(image, (image.get_rect().w * scale, image.get_rect().h * scale))
         self.extend_world(Settings.WIN_W)
@@ -49,8 +52,7 @@ class SpriteHandler:
         self.base=Wave(self, rect)
 
         # Creating Bird sprite
-        self.bird = Bird(self, self.images[Settings.BIRD_COLOR + 'bird-downflap'], self.images[Settings.BIRD_COLOR + 'bird-midflap'], self.images[Settings.BIRD_COLOR + 'bird-upflap'], Settings.WIN_W // 2, Settings.WIN_H // 2, Settings.BUMP_SPEED, Settings.BIRD_MASS_KG)
-        trainee = pg.transform.scale(self.particles['smoke'],(1.5*self.bird.rect.height, 1.5*self.bird.rect.height))
+        trainee = pg.transform.scale(self.particles['smoke'],(1.5*self.images[Settings.BIRD_COLOR + 'bird-downflap'].get_rect().height, 1.5*self.images[Settings.BIRD_COLOR + 'bird-downflap'].get_rect().height))
         trainee.set_alpha(50)
         def offset_color(surface: pg.Surface, offset):
             for i in range(surface.get_width()):
@@ -61,7 +63,7 @@ class SpriteHandler:
                     pixel.b = min(max(0,pixel.b+offset),255)
                     surface.set_at((i,j), pixel)
         offset_color(trainee,60)
-        self.smoke = Smoke(self.renderer, trainee,self.bird.x,self.bird.y, Settings.SPEED)
+        self.bird = Bird(self, self.images[Settings.BIRD_COLOR + 'bird-downflap'], self.images[Settings.BIRD_COLOR + 'bird-midflap'], self.images[Settings.BIRD_COLOR + 'bird-upflap'], Settings.WIN_W // 2, Settings.WIN_H // 2, Settings.BUMP_SPEED, Settings.BIRD_MASS_KG, trainee)
         # Creating menu
         
         if Settings.USE_OFFICIAL_ASSETS:
@@ -123,7 +125,7 @@ class SpriteHandler:
 
     def rand_pipe_requeue_interval(self, speed):
         offset = speed/Settings.SPEED
-        return uniform(2.0 + offset,7.0 + offset)*self.pipe_width/speed
+        return uniform(2.5 + offset,7.0 + offset)*self.pipe_width/speed
     
     def update_speed(self, speed):
         self.base.update_speed(-speed)
@@ -207,17 +209,13 @@ class SpriteHandler:
         self.group_collide.update()
         self.base.update()
         self.group_bird.update()
-        self.smoke.set_speed(-3*self.base.vel_x*self.app.dt, -self.bird.vel_y*self.app.dt)
-        self.smoke.set_source_position(self.bird.x, self.bird.y)
-        self.smoke.update()
         self.group_foreground.update()
 
     def draw(self):
         self.group_background.draw(self.renderer)
         self.group_collide.draw(self.renderer)
+        self.bird.draw()
         self.base.draw()
-        self.smoke.draw()
-        self.group_bird.draw(self.renderer)
         self.group_foreground.draw(self.renderer)
 
     def on_mouse_press(self):
