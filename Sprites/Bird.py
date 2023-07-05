@@ -22,16 +22,19 @@ class Bird(SpriteUnit):
         self.bubbles = Bubbles(self.handler.renderer,self.x,self.y, self.handler.base.rect.y - self.handler.base.rect.h//2)
         self.trainee = self.smoke
         self.bottom = Settings.WIN_H - self.image.get_rect().w//4
+        if Settings.platform=='android':
+            self.bottom -= self.image.get_rect().w
 
     def translate(self):
         if self.x < 2*self.orig_x/3:
             self.vel_x = 0
         else:
             self.x += self.vel_x * self.handler.app.dt
-        self.vel_y = self.vel_y  + 9.81*1000*self.weight*self.handler.app.dt
-        self.y += self.vel_y * self.handler.app.dt
+        if self.weight > 0.0:
+            self.vel_y = self.vel_y  + 9.81*1000*self.weight*self.handler.app.dt
+            self.y += self.vel_y * self.handler.app.dt
         if self.y < 0 :
-            self.vel_y *= -1
+            self.vel_y = abs(self.vel_y)
         self.rect.center = self.x, self.y
         if self.vel_y > self.bump_speed/5 or self.vel_y < -70*self.bump_speed/100:
             self.update_image(self.image_up)

@@ -1,6 +1,5 @@
 import sys
 import os     
-os.environ['SDL_HINT_RENDER_SCALE_QUALITY'] = '2'
 sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 import Settings        
 if Settings.platform=='android':
@@ -17,7 +16,7 @@ import Exfont
 import random
 from pygame._sdl2.video import Texture
 
-__version__ = "1.2.3"
+__version__ = "1.2.4"
 class App:
     def __init__(self):
         if Settings.platform=='android':

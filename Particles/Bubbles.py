@@ -5,12 +5,12 @@ import pygame.gfxdraw as gfx
 
 class Bubble:
     def __init__(self, renderer : Renderer, texture : Texture, alpha : int, x, y, max_y):
-        self.x = x+random.randrange(-40,40)*0.1*texture.get_rect().w
+        self.x = x
         self.y = y
         self.scale = 1.0
         self.texture = texture
         self.alpha = alpha
-        self.alpha_rate = 1
+        self.alpha_rate = 0
         self.alive = True
         self.vy = 0
         self.vx = 0
@@ -22,7 +22,7 @@ class Bubble:
         self.y += self.vy
         self.vy = -1
         if self.scale < 4:
-            self.scale += 0.01
+            self.scale += 0.015
         self.alpha -= self.alpha_rate
         if self.alpha < 0:
             self.alpha = 0
@@ -33,7 +33,7 @@ class Bubble:
 
     def draw(self):
         self.texture.alpha = self.alpha
-        self.texture.draw(self.src_rect, self.dest_rect)
+        self.texture.draw(None, self.dest_rect)
 
 class Bubbles:
     def __init__(self, renderer, x, y, max_y):
@@ -41,6 +41,7 @@ class Bubbles:
         surface = pg.Surface((6,6), pg.SRCALPHA)
         gfx.circle(surface,surface.get_rect().w//2, surface.get_rect().h//2,surface.get_rect().w//2,  pg.Color('white'))
         self.texture = Texture.from_surface(renderer, surface)
+        self.width  = self.texture.get_rect().w
         self.alpha = surface.get_alpha()
         self.x = x
         self.y = y
@@ -59,7 +60,8 @@ class Bubbles:
         self.counter += 1
         if self.counter > 10:
             self.counter = 0
-            self.particles.append(Bubble(self.renderer,self.texture,self.alpha, self.x,self.y, self.max_y))
+            x = self.x+random.randrange(-6,6)*self.width
+            self.particles.append(Bubble(self.renderer,self.texture,self.alpha, x,self.y, self.max_y))
         for particle in self.particles:
             particle.update()
 

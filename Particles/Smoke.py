@@ -10,7 +10,7 @@ class SmokeParticle:
         self.scale = 1.0
         self.texture = texture
         self.alpha = alpha
-        self.alpha_rate = 4
+        self.alpha_rate = 3
         self.alive = True
         self.vy = vel_y
         self.vx = vel_x

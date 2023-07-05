@@ -203,7 +203,7 @@ android.add_src = Android/java
 #android.add_resources =
 
 # (list) Gradle dependencies to add
-android.gradle_dependencies = com.google.android.gms:play-services-ads:22.1.0,com.google.gms:google-services:4.3.15,androidx.work:work-runtime:2.7.1,com.google.android.gms:play-services-games-v2:17.0.0,com.google.android.gms:play-services-tasks:18.0.2
+android.gradle_dependencies = com.google.android.gms:play-services-ads:22.1.0,com.google.gms:google-services:4.3.15,androidx.work:work-runtime:2.8.0,com.google.android.gms:play-services-games-v2:17.0.0,com.google.android.gms:play-services-tasks:18.0.2
 
 # (bool) Enable AndroidX support. Enable when 'android.gradle_dependencies'
 # contains an 'androidx' package, or any package from Kotlin source.
