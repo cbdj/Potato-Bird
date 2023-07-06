@@ -2,6 +2,7 @@ import pygame as pg
 import random
 from pygame._sdl2 import Texture, Image, Renderer
 import pygame.gfxdraw as gfx
+import Settings
 
 class Bubble:
     def __init__(self, renderer : Renderer, texture : Texture, alpha : int, x, y, max_y):
@@ -27,6 +28,8 @@ class Bubble:
         if self.alpha < 0:
             self.alpha = 0
         self.alive = self.y > self.max_y
+        if not self.alive:
+            pg.event.post(pg.event.Event(Settings.EVENT_SOUND, sound = 'bubble'))
         self.dest_rect.w = self.src_rect.w*self.scale
         self.dest_rect.h = self.src_rect.h*self.scale
         self.dest_rect.center = (self.x, self.y)

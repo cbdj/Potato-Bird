@@ -69,7 +69,7 @@ class Bird(SpriteUnit):
         if  self.y > self.floor:
             self.trainee = self.bubbles
             if not self.dead:
-                pg.event.post(pg.event.Event(Settings.EVENT_SOUND, sound = 'hit'))
+                pg.event.post(pg.event.Event(Settings.EVENT_SOUND, sound = 'splash'))
                 pg.event.post(pg.event.Event(Settings.SHAKE_SCREEN, duration = 20, intensity = 10))
                 self.handler.base.splash(self.x, self.vel_y/20)
                 self.hit = True
