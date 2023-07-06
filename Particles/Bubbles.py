@@ -39,7 +39,7 @@ class Bubble:
         self.texture.draw(None, self.dest_rect)
 
 class Bubbles:
-    def __init__(self, renderer, x, y, max_y):
+    def __init__(self, renderer, x, y, max_y, volume : int = 20):
         self.max_y = max_y
         surface = pg.Surface((6,6), pg.SRCALPHA)
         gfx.circle(surface,surface.get_rect().w//2, surface.get_rect().h//2,surface.get_rect().w//2,  pg.Color('white'))
@@ -50,6 +50,8 @@ class Bubbles:
         self.y = y
         self.vel_x = 0
         self.vel_y = 0
+        self.volume_orig = volume
+        self.volume = volume
         self.renderer = renderer
         self.particles = []
         self.counter = 0
@@ -60,11 +62,13 @@ class Bubbles:
 
     def update(self):
         self.particles = [i for i in self.particles if i.alive]
-        self.counter += 1
-        if self.counter > 10:
-            self.counter = 0
-            x = self.x+random.randrange(-6,6)*self.width
-            self.particles.append(Bubble(self.renderer,self.texture,self.alpha, x,self.y, self.max_y))
+        if self.volume > 0:
+            self.counter += 1
+            if self.counter > 10:
+                self.counter = 0
+                x = self.x+random.randrange(-6,6)*self.width
+                self.particles.append(Bubble(self.renderer,self.texture,self.alpha, x,self.y, self.max_y))
+                self.volume -= 1
         for particle in self.particles:
             particle.update()
 
@@ -74,3 +78,4 @@ class Bubbles:
 
     def reset(self):
         self.particles.clear()
+        self.volume = self.volume_orig
