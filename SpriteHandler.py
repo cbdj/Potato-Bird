@@ -72,7 +72,9 @@ class SpriteHandler:
             self.menu = Menu(self, Settings.WIN_W / 2, Settings.WIN_H / 2, Settings.TITLE, self.images[Settings.BIRD_COLOR + 'bird-midflap'], Settings.FONT_SIZE, scale)
         def show_leaderboard():
             if Settings.platform == 'android' and len(self.leaderboards) > 0:
-                self.app.playgamesservices.leaderboards_client.show_leaderboard(self.leaderboards.keys()[-1])
+                id = list(self.leaderboards.keys())[-1]
+                print(f"showing {id}")
+                self.app.playgamesservices.leaderboards_client.show_leaderboard(id)
         self.leaderboard_button = Button(self, self.images['cup'], self.images['cup'],self.images['cup'].get_width()//2, self.images['cup'].get_height()//2, show_leaderboard)
         self.best = Best(self, self.leaderboard_button.x + self.leaderboard_button.image.get_rect().w, self.leaderboard_button.y, Settings.base_path, Settings.FONT_SIZE, scale)
         self.leaderboards = {}
@@ -81,7 +83,8 @@ class SpriteHandler:
             def get_leaderboards_cb(leaderboards):
                 self.leaderboards = leaderboards
                 if len(leaderboards) > 0:
-                    self.app.playgamesservices.leaderboards_client.get_remote_best(leaderboards.keys()[-1],self.best.set_remote_best)
+                    self.app.playgamesservices.leaderboards_client.get_remote_best(list(leaderboards.keys())[-1],self.best.set_remote_best)
+            self.app.playgamesservices.leaderboards_client.get_leaderboards(get_leaderboards_cb)
             def get_achievements_cb(achievements):
                 self.achievements = achievements
             self.app.playgamesservices.achievements_client.get_achievements(get_achievements_cb)
@@ -204,8 +207,20 @@ class SpriteHandler:
             if pipe1.x < self.bird.x and not pipe1.point_given:
                 pg.event.post(pg.event.Event(Settings.EVENT_SOUND, sound = 'point'))
                 self.score.increment()
-                if self.score.get() > self.best.get():
-                    self.best.set(self.score.get())
+                score = self.score.get()
+                if score > self.best.get():
+                    self.best.set(score)
+                if Settings.platform == 'android':
+                    if score == 20:
+                        self.app.playgamesservices.achievements_client.unlock('CgkIzdaAt-geEAIQBg') #sparrow
+                    if score == 40:
+                        self.app.playgamesservices.achievements_client.unlock('CgkIzdaAt-geEAIQBw') #swallow
+                    if score == 50:
+                        self.app.playgamesservices.achievements_client.unlock('CgkIzdaAt-geEAIQCA') #wild goose
+                    if score == 70:
+                        self.app.playgamesservices.achievements_client.unlock('CgkIzdaAt-geEAIQCQ') #migratory bird
+                    if score == 80:
+                        self.app.playgamesservices.achievements_client.unlock('CgkIzdaAt-geEAIQCg') #potato bird
                 pipe1.point_given = True
                 break
             elif pipe1.x > self.bird.x:

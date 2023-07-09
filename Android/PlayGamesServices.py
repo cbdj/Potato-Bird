@@ -56,11 +56,11 @@ class _AchievementsClient():
         self._client.get_achievements(success_callback)
     def show_achievements(self):
         self._client.show_achievements()
-    def increment(id, numSteps):
+    def increment(self, id, numSteps):
         self._client.increment(id, numSteps)
-    def set_steps(id, numSteps):
+    def set_steps(self, id, numSteps):
         self._client.set_steps(id, numSteps)
-    def unlock(id):
+    def unlock(self, id):
         self._client.unlock(id)
-    def reveal(id):
+    def reveal(self, id):
         self._client.reveal(id)

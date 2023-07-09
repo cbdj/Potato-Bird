@@ -20,16 +20,21 @@ class PlayGamesIntents:
                                         enabled = False,
                                         touchscreen=touchscreen,
                                         touchscreen_motion_selection=touchscreen)
-        def callback(cb):
+                                        
+        self.menu.add.image(os.path.join(Settings.SPRITE_DIR_PATH,'games_leaderboards_green.png'), scale=(0.5,0.5),selectable=False)
+        def on_show_leaderboards():
             pg.event.post(pg.event.Event(Settings.EVENT_SOUND, sound = 'button_press'))
-            cb()
-
-        self.menu.add.image(os.path.join(Settings.SPRITE_DIR_PATH,'games_leaderboards_green.png'), scale=(0.5,0.5),selectable=True, onselect=lambda : callback(self.app.playgamesservices.leaderboards_client.show_leaderboards))
-        self.menu.add.image(os.path.join(Settings.SPRITE_DIR_PATH,'games_achievements_green.png'), scale=(0.5,0.5),selectable=True, onselect=lambda : callback(self.app.playgamesservices.achievements_client.show_achievements))
+            self.app.playgamesservices.leaderboards_client.show_leaderboards()
+        self.menu.add.button('Show leaderboards', on_show_leaderboards)
+        self.menu.add.image(os.path.join(Settings.SPRITE_DIR_PATH,'games_achievements_green.png'), scale=(0.5,0.5),selectable=False)
+        def on_show_achievements():
+            pg.event.post(pg.event.Event(Settings.EVENT_SOUND, sound = 'button_press'))
+            self.app.playgamesservices.achievements_client.show_achievements()
+        self.menu.add.button('Show achievements', on_show_achievements)
         def on_back():
             pg.event.post(pg.event.Event(Settings.EVENT_SOUND, sound = 'button_press'))
             self.disable()
-        self.menu.add.button('Back', lambda : callback(self.disable))
+        self.menu.add.button('Back', on_back)
 
     def update(self, events):
         self.menu.update(events)

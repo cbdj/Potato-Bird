@@ -71,6 +71,7 @@ class _PlayGamesServices():
         self._achievements_client = _AchievementsClient(self)
         
         self._synchronized = True
+        self.synchronize()
         
     def synchronize(self): 
         print(f"_PlayGamesServices : synchronize")
@@ -196,6 +197,7 @@ class _LeaderboardClient():
             if score is not None:
                 self.submit_candidates[id] = None
                 self._submit_score(id, score)
+                return
                 
         for id, best in self.remote_bests.items():
             if best is None:
@@ -246,7 +248,8 @@ class _LeaderboardClient():
     def _submit_score(self, id, score):
         print("_LeaderboardClient : BEG _submit_score")
         JavaBridge.PlayGames.getLeaderboardsClient(self._pgs.activity).submitScore(id, score);
-        print(f"_LeaderboardClient : {self.player.getDisplayName()} submitted a new score : {id} : {score}")
+        print(f"_LeaderboardClient : {self._pgs.player.getDisplayName()} submitted a new score : {id} : {score}")
+        self.synchronize()
         print("_LeaderboardClient : END _submit_score")
 
     def submit_score(self, id, score):
@@ -372,22 +375,22 @@ class _AchievementsClient():
             self.get_achievements_callback = None
             get_achievements_callback(self.achievements)
             
-        for id, increment in self.increment_candidates:
+        for id, increment in self.increment_candidates.items():
             if increment is not None:
                 self.increment_candidates[id] = None
                 self._increment(id, num_steps)
                 
-        for id, num_steps in self.set_steps_candidates:
+        for id, num_steps in self.set_steps_candidates.items():
             if num_steps is not None:
                 self.set_steps_candidates[id] = None
                 self._set_steps(id, num_steps)
                 
-        for id, unlock in self.unlock_candidates:
+        for id, unlock in self.unlock_candidates.items():
             if unlock:
                 self.unlock_candidates[id] = False
                 self._unlock(id)
                 
-        for id, reveal in self.reveal_candidates:
+        for id, reveal in self.reveal_candidates.items():
             if reveal:
                 self.reveal_candidates[id] = False
                 self._reveal(id)
@@ -433,7 +436,7 @@ class _AchievementsClient():
     @run_on_ui_thread
     def _on_show_achievements_success(self, intent):
         print(f"_AchievementsClient : Showing Achievements")
-        self._pgs.activity.startActivityForResult(intent, 9004);
+        self._pgs.activity.startActivityForResult(intent, 9003);
         self.showing_achievements = False
         self.synchronize()
     @run_on_ui_thread
