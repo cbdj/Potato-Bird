@@ -10,6 +10,7 @@ from pygame._sdl2.video import Window, Renderer, Texture, Image
 from SpriteHandler import SpriteHandler
 from SoundHandler import SoundHandler
 from Configuration import Configuration
+from PlayGamesIntents import PlayGamesIntents
 import pygame as pg
 # import pygame.freetype as ft
 import Exfont 
@@ -34,6 +35,8 @@ class App:
         self.target = Texture(self.renderer, size=size, target = True)
         self.sprite_handler = SpriteHandler(self)
         self.configuration = Configuration(self, Settings.WIN_W,Settings.WIN_H)
+        if Settings.platform=='android':
+            self.play_games_intents = PlayGamesIntents(self, Settings.WIN_W,Settings.WIN_H)
         self.sound_handler = SoundHandler(Settings.AUDIO_DIR_PATH)
         self.clock = pg.time.Clock()
         self.font = pg.font.Font(None, Settings.FONT_SIZE)
@@ -76,6 +79,9 @@ class App:
             self.draw_fps()
         if self.configuration.is_enabled():
             self.configuration.draw(self.renderer)
+        if Settings.platform=='android':
+            if self.play_games_intents.is_enabled():
+                self.play_games_intents.draw(self.renderer)
         self.renderer.target = None
         dest_rect = self.target.get_rect()
         if self.shake_duration > 0:
@@ -108,6 +114,8 @@ class App:
         events = pg.event.get(exclude=super_events_types)
         if self.configuration.is_enabled():
             self.configuration.update(events)
+        elif Settings.platform=='android' and self.play_games_intents.is_enabled():
+            self.play_games_intents.update(events)
         else:
             for e in events:
                 if e.type == pg.KEYDOWN:

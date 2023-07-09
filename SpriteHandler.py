@@ -70,11 +70,10 @@ class SpriteHandler:
             self.menu = SpriteUnit(self, self.images['message'], Settings.WIN_W / 2, Settings.WIN_H / 2)
         else:
             self.menu = Menu(self, Settings.WIN_W / 2, Settings.WIN_H / 2, Settings.TITLE, self.images[Settings.BIRD_COLOR + 'bird-midflap'], Settings.FONT_SIZE, scale)
-        def show_leaderboards():
-            if Settings.platform == 'android':
-                self.app.playgamesservices.leaderboards_client.show_leaderboards()
-                pass
-        self.leaderboard_button = Button(self, self.images['cup'], self.images['cup'],self.images['cup'].get_width()//2, self.images['cup'].get_height()//2, show_leaderboards)
+        def show_leaderboard():
+            if Settings.platform == 'android' and len(self.leaderboards) > 0:
+                self.app.playgamesservices.leaderboards_client.show_leaderboard(self.leaderboards.keys()[-1])
+        self.leaderboard_button = Button(self, self.images['cup'], self.images['cup'],self.images['cup'].get_width()//2, self.images['cup'].get_height()//2, show_leaderboard)
         self.best = Best(self, self.leaderboard_button.x + self.leaderboard_button.image.get_rect().w, self.leaderboard_button.y, Settings.base_path, Settings.FONT_SIZE, scale)
         self.leaderboards = {}
         self.achievements = {}
@@ -86,9 +85,12 @@ class SpriteHandler:
             def get_achievements_cb(achievements):
                 self.achievements = achievements
             self.app.playgamesservices.achievements_client.get_achievements(get_achievements_cb)
-        def show_settings():
-            self.app.configuration.enable()
-        self.show_settings_button = Button(self, self.images['settings'], self.images['settings'], Settings.WIN_W - self.images['settings'].get_width()//2, self.images['settings'].get_height()//2, show_settings)
+            
+        self.show_settings_button = Button(self, self.images['settings'], self.images['settings'], Settings.WIN_W - self.images['settings'].get_width()//2, self.images['settings'].get_height()//2, lambda : self.app.configuration.enable())
+        if Settings.platform == 'android':
+            show_google_play_services_button_surface = self.images['games_controller']
+            show_google_play_services_button_surface = pg.transform.scale_by(show_google_play_services_button_surface, self.images['settings'].get_height()/show_google_play_services_button_surface.get_height())
+            self.show_google_play_services_button = Button(self, show_google_play_services_button_surface, show_google_play_services_button_surface, Settings.WIN_W - self.images['settings'].get_width() - show_google_play_services_button_surface.get_width()/2, show_google_play_services_button_surface.get_height()//2, lambda : self.app.play_games_intents.enable())
         self._gameover = SpriteUnit(self,self.images['gameover'], Settings.WIN_W / 2, Settings.WIN_H / 2)
         self.score=Score(self, Settings.WIN_W / 2, Settings.WIN_W / 8, Settings.FONT_SIZE, scale)
         
@@ -118,6 +120,8 @@ class SpriteHandler:
             pipe_reversed.reset()
         self.group_foreground.empty()
         self.group_foreground.add(self.menu, self.score, self.leaderboard_button, self.best, self.show_settings_button)
+        if Settings.platform == 'android':
+            self.group_foreground.add(self.show_google_play_services_button)
         self.update_speed(0)
         self.app.dt=0.0
         self.app.speed = int(Settings.SPEED*Settings.speed_multiplier)
@@ -232,6 +236,8 @@ class SpriteHandler:
                 self.leaderboard_button.press()
             elif self.show_settings_button.alive() and self.show_settings_button.rect.collidepoint((x, y)):
                 self.show_settings_button.press()
+            elif Settings.platform == 'android' and self.show_google_play_services_button.alive() and self.show_google_play_services_button.rect.collidepoint((x, y)):
+                self.show_google_play_services_button.press()
             else:
                 self.on_action()
         elif mouse_button[2]:
@@ -243,6 +249,8 @@ class SpriteHandler:
             self.leaderboard_button.unpress()
         if not mouse_button[0] and self.show_settings_button.pressed:
             self.show_settings_button.unpress()
+        if Settings.platform == 'android' and not mouse_button[0] and self.show_google_play_services_button.pressed:
+            self.show_google_play_services_button.unpress()
 
     def on_key_press(self, key):
         if key == pg.K_SPACE:
@@ -265,6 +273,8 @@ class SpriteHandler:
         self.score.reset()
         self.group_foreground.empty()
         self.group_foreground.add(self.score, self.leaderboard_button, self.best, self.show_settings_button)
+        if Settings.platform == 'android' : 
+            self.group_foreground.add(self.show_google_play_services_button)
         self.app.speed = int(Settings.SPEED*Settings.speed_multiplier)
         self.update_speed(self.app.speed)
         pg.time.set_timer(Settings.EVENT_DAY_NIGHT, Settings.DAY_NIGHT_TIME_MS)
