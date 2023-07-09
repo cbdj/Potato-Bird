@@ -17,7 +17,7 @@ import Exfont
 import random
 from pygame._sdl2.video import Texture
 
-__version__ = "1.2.4"
+__version__ = "1.3.0"
 class App:
     def __init__(self):
         if Settings.platform=='android':
