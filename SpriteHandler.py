@@ -70,22 +70,28 @@ class SpriteHandler:
             self.menu = SpriteUnit(self, self.images['message'], Settings.WIN_W / 2, Settings.WIN_H / 2)
         else:
             self.menu = Menu(self, Settings.WIN_W / 2, Settings.WIN_H / 2, Settings.TITLE, self.images[Settings.BIRD_COLOR + 'bird-midflap'], Settings.FONT_SIZE, scale)
-        def show_leaderboard():
+        def show_leaderboards():
             if Settings.platform == 'android':
-                self.app.playgamesservices.show_leaderboards()
+                self.app.playgamesservices.leaderboards_client.show_leaderboards()
                 pass
-        self.leaderboard_button = Button(self, self.images['cup'], self.images['cup'],self.images['cup'].get_width()//2, self.images['cup'].get_height()//2, show_leaderboard)
+        self.leaderboard_button = Button(self, self.images['cup'], self.images['cup'],self.images['cup'].get_width()//2, self.images['cup'].get_height()//2, show_leaderboards)
         self.best = Best(self, self.leaderboard_button.x + self.leaderboard_button.image.get_rect().w, self.leaderboard_button.y, Settings.base_path, Settings.FONT_SIZE, scale)
+        self.leaderboards = {}
+        self.achievements = {}
         if Settings.platform == 'android':
-            def get_leaderboards_names_cb(leaderboards):
+            def get_leaderboards_cb(leaderboards):
+                self.leaderboards = leaderboards
                 if len(leaderboards) > 0:
-                    self.app.playgamesservices.get_remote_best(leaderboards[-1],self.best.set_remote_best)
-            self.app.playgamesservices.get_leaderboards_names(get_leaderboards_names_cb)
+                    self.app.playgamesservices.leaderboards_client.get_remote_best(leaderboards.keys()[-1],self.best.set_remote_best)
+            def get_achievements_cb(achievements):
+                self.achievements = achievements
+            self.app.playgamesservices.achievements_client.get_achievements(get_achievements_cb)
         def show_settings():
             self.app.configuration.enable()
         self.show_settings_button = Button(self, self.images['settings'], self.images['settings'], Settings.WIN_W - self.images['settings'].get_width()//2, self.images['settings'].get_height()//2, show_settings)
         self._gameover = SpriteUnit(self,self.images['gameover'], Settings.WIN_W / 2, Settings.WIN_H / 2)
         self.score=Score(self, Settings.WIN_W / 2, Settings.WIN_W / 8, Settings.FONT_SIZE, scale)
+        
 
         # Creating groups
         self.group_background = pg.sprite.GroupSingle(self.background)
@@ -273,7 +279,8 @@ class SpriteHandler:
         self.group_foreground.add(self._gameover)
         self.best.save()
         if Settings.platform=='android':
-            self.app.playgamesservices.submit_score(self.score.get())
+            for id in self.leaderboards.keys():
+                self.app.playgamesservices.leaderboards_client.submit_score(id, self.score.get())
             if self.score.get() < self.best.get():
                 # get punished
                 self.app.ad_manager.may_show()

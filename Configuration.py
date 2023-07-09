@@ -9,7 +9,7 @@ class Configuration:
         self.app = app
         self.screen_size = (width,height)
         self.surface = pg.Surface(self.screen_size)
-        self.menu = pygame_menu.Menu('Configuration',
+        self.menu : pygame_menu.Menu = pygame_menu.Menu('Configuration',
                                         self.screen_size[0],
                                         self.screen_size[1],
                                         theme = pygame_menu.Theme(title_font_size = 100, widget_font_size = 80),
@@ -43,6 +43,11 @@ class Configuration:
             pg.event.post(pg.event.Event(Settings.EVENT_SOUND, sound = 'button_press'))
             self.disable()
         self.menu.add.button('Play', on_play)
+        if Settings.platform == 'android':
+            def on_show_achievements():
+                pg.event.post(pg.event.Event(Settings.EVENT_SOUND, sound = 'button_press'))
+                self.app.playgamesservices.achievements_client.show_achievements()
+            self.menu.add.button('Show achievements', on_show_achievements)
         def on_quit():
             pg.event.post(pg.event.Event(Settings.EVENT_SOUND, sound = 'button_press'))
             pg.event.post(pg.event.Event(pg.QUIT))
@@ -60,7 +65,7 @@ class Configuration:
     def draw(self, renderer : Renderer):
         self.menu.draw(self.surface)
         img = Image(Texture.from_surface(renderer, pg.transform.scale(self.surface, self.screen_size)))
-        img.draw(img.get_rect(),img.get_rect())
+        img.draw(None,img.get_rect())
 
     def is_enabled(self):
         return self.menu.is_enabled()
