@@ -17,26 +17,28 @@ platform = get_platform()
 
 package_domain="com.cldejessey"
 package_name="flappy"
-if platform=="android":
-    base_path=os.path.abspath(f"/data/data/{package_domain}.{package_name}/files/app/")
-    INTERSTITIAL_ID="ca-app-pub-4493613666001226/1483234688"
-    BANNER_ID="ca-app-pub-4493613666001226/5140290547"
-    
-elif platform=="win":
-    try:
-    # PyInstaller creates a temp folder and stores path in _MEIPASS
-        base_path = sys._MEIPASS
-    except Exception:
+try :
+    base_path = pg.system.get_pref_path(package_domain,package_name)
+except:
+    if platform=="android":
+        base_path=os.path.abspath(f"/data/data/{package_domain}.{package_name}/files/app/")
+    elif platform=="win":
+        try:
+            # PyInstaller creates a temp folder and stores path in _MEIPASS
+            base_path = sys._MEIPASS
+        except Exception:
+            base_path = os.path.abspath(".")
+    else:
         base_path = os.path.abspath(".")
-        
-elif platform=="linux":
-    base_path = os.path.abspath(".")
+print(f"base path : {base_path}")
 
 # Those two settings will be identified at app startup depending on screen resolution and assets dimensions
 WIN_W = 0
 WIN_H = 0
 
 # CONSTANTS
+INTERSTITIAL_ID="ca-app-pub-4493613666001226/1483234688"
+BANNER_ID="ca-app-pub-4493613666001226/5140290547"
 TITLE = 'Potato Bird'
 FULLSCREEN= platform == "android"
 FPS = 120

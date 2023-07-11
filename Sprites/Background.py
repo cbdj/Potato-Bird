@@ -28,4 +28,7 @@ class Background(Base):
 
     def set_dark_mode(self,on):
         self.dark_mode = on
-        self.toggle_day_night()
+        if on:
+            self.update_image(self.night_image)
+        else:
+            self.update_image(self.day_image)

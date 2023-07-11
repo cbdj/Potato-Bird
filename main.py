@@ -34,7 +34,6 @@ class App:
         self.renderer = Renderer(self.window, target_texture = True)
         self.target = Texture(self.renderer, size=size, target = True)
         self.sprite_handler = SpriteHandler(self)
-        self.configuration = Configuration(self, Settings.WIN_W,Settings.WIN_H)
         if Settings.platform=='android':
             self.play_games_intents = PlayGamesIntents(self, Settings.WIN_W,Settings.WIN_H)
         self.sound_handler = SoundHandler(Settings.AUDIO_DIR_PATH)
@@ -44,6 +43,7 @@ class App:
         self.running = True
         self.display_fps = False
         self.background = False
+        self.configuration = Configuration(self, Settings.WIN_W,Settings.WIN_H)
                 
         self.shake_intensity = 0
         self.shake_duration = 0
