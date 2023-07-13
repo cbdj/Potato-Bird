@@ -31,7 +31,7 @@ except:
     else:
         base_path = os.path.abspath(".")
 print(f"base path : {base_path}")
-
+base_path = os.path.abspath(".") # A SUPPRIMER
 # Those two settings will be identified at app startup depending on screen resolution and assets dimensions
 WIN_W = 0
 WIN_H = 0
@@ -65,3 +65,5 @@ AD_TIME_MS = 30000
 EVENT_AD = pg.event.custom_type()
 EVENT_SOUND = pg.event.custom_type()
 SHAKE_SCREEN = pg.event.custom_type()
+INCREMENT_SPEED = pg.event.custom_type()
+BULL_TIMEOUT = 10

@@ -16,6 +16,7 @@ import pygame as pg
 import Exfont 
 import random
 from pygame._sdl2.video import Texture
+from Sprites.Bull import Bull
 
 __version__ = "1.3.0"
 class App:
@@ -24,7 +25,10 @@ class App:
             self.ad_manager = AdManager()
             self.playgamesservices = PlayGamesServices()
         pg.init()
-        pg.mixer.init()
+        try:
+            pg.mixer.init()
+        except:
+            print("Couldn't init mixer : no sound")
         self.dt = 0.0
         self.speed = Settings.SPEED
         screen_info = pg.display.Info()
@@ -138,6 +142,12 @@ class App:
                 elif e.type == Settings.SHAKE_SCREEN:
                     self.shake_intensity = e.intensity
                     self.shake_duration = e.duration
+                elif e.type == Settings.INCREMENT_SPEED:
+                    self.speed += e.increment
+                    self.sprite_handler.update_speed(self.speed)
+                elif e.type == Bull.event:
+                    self.sprite_handler.bird.bull = False
+                    self.sprite_handler.bull.ready = True
 
     def run(self):
         while self.running:

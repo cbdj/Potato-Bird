@@ -51,7 +51,6 @@ class Configuration:
         self.menu.add.toggle_switch('Dark mode :',default=self.configuration['dark_mode'],onchange=set_dark_mode)
         def set_show_fps(value):
             self.configuration['show_fps'] = value
-            self.app.set_show_fps(value)
         self.menu.add.toggle_switch('Show FPS :',default=self.configuration['show_fps'],onchange=set_show_fps)
         def on_play():
             self.synchronize()

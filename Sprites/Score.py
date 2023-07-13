@@ -39,7 +39,7 @@ class Score(SpriteUnit):
 class Best(Score):
     def __init__(self, handler, x, y, save_path, font_size, scale = 1.0):
         super().__init__(handler, x, y, font_size, scale)
-        self.remote_best=0
+        self.remote_best=None
         self.orig_w = self.image.get_rect().w
         self.score_path = os.path.join(save_path, 'record.txt')
         print(f'Record file path : {os.path.abspath(self.score_path)}')
@@ -48,8 +48,9 @@ class Best(Score):
                 self.set(int(score_file.read()))
                 
     def update(self):
-        if self.remote_best > self.score:
+        if self.remote_best is not None:
             self.set(self.remote_best)
+            self.remote_best = None
         super().update()
 
     def update_slow(self):

@@ -3,6 +3,7 @@ from Sprites.Background import Background
 from Sprites.Base import Base
 from Sprites.Pipe import Pipe
 from Sprites.Bird import Bird
+from Sprites.Bull import Bull
 from Sprites.Score import Score, Best
 from Sprites.Menu import Menu
 from Sprites.Button import Button
@@ -10,7 +11,7 @@ from Sprites.Water import Wave
 from Sprites.SpriteUnit import SpriteUnit
 import pygame as pg
 import pathlib
-from random import randrange, uniform
+from random import randrange, uniform, random
 import Exfont
 
 class SpriteHandler:
@@ -64,8 +65,8 @@ class SpriteHandler:
                     surface.set_at((i,j), pixel)
         offset_color(trainee,60)
         self.bird = Bird(self, self.images[Settings.BIRD_COLOR + 'bird-downflap'], self.images[Settings.BIRD_COLOR + 'bird-midflap'], self.images[Settings.BIRD_COLOR + 'bird-upflap'], Settings.WIN_W // 2, Settings.WIN_H // 2, Settings.BUMP_SPEED, Settings.BIRD_MASS_KG, trainee)
+        self.bull = Bull(self, self.images['bull'],x,Settings.WIN_H//2)
         # Creating menu
-        
         if Settings.USE_OFFICIAL_ASSETS:
             self.menu = SpriteUnit(self, self.images['message'], Settings.WIN_W / 2, Settings.WIN_H / 2)
         else:
@@ -101,6 +102,7 @@ class SpriteHandler:
         # Creating groups
         self.group_background = pg.sprite.GroupSingle(self.background)
         self.group_collide = pg.sprite.Group(self.pipes) # special group for sprites that Bird can collide on
+        self.group_bonus = pg.sprite.Group(self.bull)
         self.group_bird = pg.sprite.GroupSingle(self.bird)
         self.group_foreground = pg.sprite.Group(self.score, self.score, self.leaderboard_button)
         
@@ -115,6 +117,7 @@ class SpriteHandler:
         self.day=True
         self._started = False
         self.background.reset()
+        self.bull.reset()
         self.base.reset()
         self.score.reset()
         self.bird.reset()
@@ -130,6 +133,7 @@ class SpriteHandler:
         self.app.speed = int(Settings.SPEED*Settings.speed_multiplier)
         self.group_background.update()
         self.group_collide.update()
+        self.group_bonus.update()
         self.group_bird.update()
         self.group_foreground.update()
            
@@ -144,6 +148,7 @@ class SpriteHandler:
         self.base.update_speed(-speed)
         # self.base.vel_x = -speed
         self.bird.vel_x = -speed/4
+        self.bull.vel_x = -speed
         for (pipe, pipe_reversed) in self.pipes :
             pipe.vel_x = -speed
             pipe_reversed.vel_x = -speed
@@ -191,9 +196,23 @@ class SpriteHandler:
             pipe.y = pipe.orig_y - factor
             pipe_reversed.y = pipe_reversed.orig_y - factor
             pipe.x = pipe_reversed.x = Settings.WIN_W + pipe.rect.width/2
+        def bull_requeue():
+            """ 
+            Reque bull 
+            Used when bull is out of camera range
+            """
+            factor = randrange(-1,3,2)*randrange(0, 4*self.bull.rect.height)
+            self.bull.y = self.bull.orig_y + factor
+            self.bull.x = Settings.WIN_W + self.bull.rect.width/2
 
         self.pipe_reque_time += self.app.dt
         if self.pipe_reque_time > self.pipe_requeue_interval:
+            
+            if self.bull.vel_x != 0 and self.bull.x < -self.bull.rect.width and self.bull.ready:
+                self.pipe_reque_time = 0.0
+                self.pipe_requeue_interval = self.rand_pipe_requeue_interval(-self.bull.vel_x)
+                bull_requeue()
+                return
             for (pipe1,pipe2) in self.pipes:
                 if pipe1.vel_x != 0 and pipe1.x < -pipe1.rect.width :
                     # requeue one Pipe that is out of screen
@@ -201,7 +220,8 @@ class SpriteHandler:
                     self.pipe_requeue_interval = self.rand_pipe_requeue_interval(-pipe1.vel_x)
                     pipe_requeue(pipe1, pipe2)
                     break
-
+            
+            
     def update_score(self):
         for (pipe1,pipe2) in self.pipes:
             if pipe1.x < self.bird.x and not pipe1.point_given:
@@ -232,6 +252,7 @@ class SpriteHandler:
         self.maybe_requeue_pipes()
         self.group_background.update()
         self.group_collide.update()
+        self.group_bonus.update()
         self.base.update()
         self.group_bird.update()
         self.group_foreground.update()
@@ -239,6 +260,7 @@ class SpriteHandler:
     def draw(self):
         self.group_background.draw(self.renderer)
         self.group_collide.draw(self.renderer)
+        self.group_bonus.draw(self.renderer)
         self.bird.draw()
         self.base.draw()
         self.group_foreground.draw(self.renderer)

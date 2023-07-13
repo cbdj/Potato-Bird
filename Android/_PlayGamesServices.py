@@ -157,6 +157,7 @@ class _LeaderboardClient():
         self.getting_remote_best = False
         self.getting_remote_best_current_id = None
         self.submit_candidates = {}
+        self.submitting_score = False
         self.get_remote_best_callbacks = {}
         self.on_fetched_best = None
         self.on_fetched_leaderboards = None
@@ -167,6 +168,8 @@ class _LeaderboardClient():
         self.show_leaderboard_failure_listener = OnFailureListener(self._on_show_leaderboard_failure)
         self.get_remote_best_success_listener = OnSuccessListener(self._on_get_remote_best_success)
         self.get_remote_best_failure_listener = OnFailureListener(self._on_get_remote_best_failure)
+        self.submit_score_success_listener = OnSuccessListener(self._on_submit_score_success)
+        self.submit_score_failure_listener = OnFailureListener(self._on_submit_score_failure)
         
     def synchronize(self):
         print(f"_LeaderboardClient : synchronize")
@@ -193,9 +196,11 @@ class _LeaderboardClient():
         
         if not pgs_synchronized:
             return
+        if self.submitting_score:
+            return
         for id, score in self.submit_candidates.items():
             if score is not None:
-                self.submit_candidates[id] = None
+                self.submitting_score = True
                 self._submit_score(id, score)
                 return
                 
@@ -244,12 +249,22 @@ class _LeaderboardClient():
         self.synchronize()
         print(f"_LeaderboardClient : END get_leaderboards")
         
+    def _on_submit_score_failure(self, e):
+        print(f"_LeaderboardClient :_on_submit_score_failure : {e.getMessage()}")
+        self.submitting_score = False
+    @run_on_ui_thread
+    def _on_submit_score_success(self, data):
+        print(f"_LeaderboardClient : _on_submit_score_success {data.toString()}")
+        self.submitting_score = False
+        self.submit_candidates[data.getLeaderboardId()] = None
+        self.synchronize()
     @run_on_ui_thread
     def _submit_score(self, id, score):
         print("_LeaderboardClient : BEG _submit_score")
-        JavaBridge.PlayGames.getLeaderboardsClient(self._pgs.activity).submitScore(id, score);
-        print(f"_LeaderboardClient : {self._pgs.player.getDisplayName()} submitted a new score : {id} : {score}")
-        self.synchronize()
+        task = JavaBridge.PlayGames.getLeaderboardsClient(self._pgs.activity).submitScoreImmediate(id, score);
+        task.addOnSuccessListener(self.submit_score_success_listener)
+        task.addOnFailureListener(self.submit_score_failure_listener)
+        print(f"_LeaderboardClient : {self._pgs.player.getDisplayName()} submitting a new score : {id} : {score}")
         print("_LeaderboardClient : END _submit_score")
 
     def submit_score(self, id, score):

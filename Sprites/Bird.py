@@ -4,6 +4,7 @@ import pygame as pg
 import Settings
 from Particles.Smoke import Smoke
 from Particles.Bubbles import Bubbles
+from .Bull import Bull
 
 class Bird(SpriteUnit):
     def __init__(self, handler, image_down, image_middle, image_up, x, y, bump_speed, mass, trainee : pg.Surface):
@@ -22,6 +23,7 @@ class Bird(SpriteUnit):
         self.bubbles = Bubbles(self.handler.renderer,self.x,self.y, self.handler.base.rect.y - self.handler.base.rect.h//2)
         self.trainee = self.smoke
         self.bottom = Settings.WIN_H - self.image.get_rect().w//4
+        self.bull = False
 
     def translate(self):
         if self.x < 2*self.orig_x/3:
@@ -53,8 +55,26 @@ class Bird(SpriteUnit):
         self.vel_y = -speed
         pg.event.post(pg.event.Event(Settings.EVENT_SOUND, sound = 'wing'))
 
+    @property
+    def bull(self):
+        return self._bull
+    @bull.setter
+    def bull(self, value:bool):
+        self._bull = value
+        if value:
+            pg.time.set_timer(Bull.event, Bull.timeout)
+            pg.event.post(pg.event.Event(Settings.INCREMENT_SPEED, increment = -Bull.speed_increment))
+        else:
+            pg.event.post(pg.event.Event(Settings.INCREMENT_SPEED, increment = Bull.speed_increment))
     def update(self):
         self.translate() 
+        bonus = pg.sprite.spritecollide(self, self.handler.group_bonus,dokill=False)
+        if len(bonus):
+            for bonu in bonus:
+                if isinstance(bonu, Bull) and not self.bull:
+                    self.bull = True
+                    bonu.ready = False
+
         if not self.dead and not self.hit and pg.sprite.spritecollideany(self, self.handler.group_collide, pg.sprite.collide_mask):
             self.hit = True
             self.vel_x = 0
