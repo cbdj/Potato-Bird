@@ -28,6 +28,7 @@ class SpriteHandler:
         scale = screen_info.current_h/background_sprite_h
         Settings.BUMP_SPEED = Settings.BUMP_SPEED * scale
         Settings.SPEED = Settings.SPEED * scale
+        Bull.speed_increment = Bull.speed_increment * scale
         Settings.SPEED_INCREASE_FACTOR = Settings.SPEED_INCREASE_FACTOR * scale
         Settings.BIRD_MASS_KG = Settings.BIRD_MASS_KG * scale
         for key, image in self.images.items():
@@ -111,10 +112,8 @@ class SpriteHandler:
         self.pipe_width = self.images['pipe-green'].get_width()
         self.pipe_requeue_interval = self.rand_pipe_requeue_interval(self.app.speed)
         self.pipe_reque_time = 0.0
-        self.reset()
 
     def reset(self):
-        self.day=True
         self._started = False
         self.background.reset()
         self.bull.reset()
@@ -128,9 +127,8 @@ class SpriteHandler:
         self.group_foreground.add(self.menu, self.score, self.leaderboard_button, self.best, self.show_settings_button)
         if Settings.platform == 'android':
             self.group_foreground.add(self.show_google_play_services_button)
-        self.update_speed(0)
         self.app.dt=0.0
-        self.app.speed = int(Settings.SPEED*Settings.speed_multiplier)
+        self.app.speed = 0
         self.group_background.update()
         self.group_collide.update()
         self.group_bonus.update()
@@ -145,8 +143,8 @@ class SpriteHandler:
         return uniform(2.5 + offset,7.0 + offset)*self.pipe_width/speed
     
     def update_speed(self, speed):
+        # print(f"update speed : {speed}")
         self.base.update_speed(-speed)
-        # self.base.vel_x = -speed
         self.bird.vel_x = -speed/4
         self.bull.vel_x = -speed
         for (pipe, pipe_reversed) in self.pipes :
@@ -192,9 +190,14 @@ class SpriteHandler:
             Reque pipes 
             Used when pipes are out of camera range
             """
-            factor = randrange(0, 2*pipe.rect.height//3)
+            vel_x = pipe.vel_x
+            factor = randrange(0, 2*pipe.orig_rect.height//3)
+            pipe.reset()
             pipe.y = pipe.orig_y - factor
+            pipe.vel_x = vel_x
+            pipe_reversed.reset()
             pipe_reversed.y = pipe_reversed.orig_y - factor
+            pipe_reversed.vel_x = vel_x
             pipe.x = pipe_reversed.x = Settings.WIN_W + pipe.rect.width/2
         def bull_requeue():
             """ 
@@ -207,7 +210,6 @@ class SpriteHandler:
 
         self.pipe_reque_time += self.app.dt
         if self.pipe_reque_time > self.pipe_requeue_interval:
-            
             if self.bull.vel_x != 0 and self.bull.x < -self.bull.rect.width and self.bull.ready:
                 self.pipe_reque_time = 0.0
                 self.pipe_requeue_interval = self.rand_pipe_requeue_interval(-self.bull.vel_x)
@@ -313,12 +315,11 @@ class SpriteHandler:
         if Settings.platform == 'android' : 
             self.group_foreground.add(self.show_google_play_services_button)
         self.app.speed = int(Settings.SPEED*Settings.speed_multiplier)
-        self.update_speed(self.app.speed)
         pg.time.set_timer(Settings.EVENT_DAY_NIGHT, Settings.DAY_NIGHT_TIME_MS)
 
     def stop(self):
         self._started = False
-        self.update_speed(0)
+        self.app.speed = 0
         pg.time.set_timer(Settings.EVENT_DAY_NIGHT, 0)
 
     def game_over(self):

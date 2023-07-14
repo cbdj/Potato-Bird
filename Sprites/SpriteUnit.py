@@ -37,6 +37,7 @@ class SpriteUnit(pg.sprite.Sprite):
         self.rect.center = self.x, self.y
 
     def reset(self):
+        self.rect = self.orig_rect.copy()
         self.x = self.orig_x
         self.y = self.orig_y 
         self.vel_x = 0

@@ -30,7 +30,7 @@ class App:
         except:
             print("Couldn't init mixer : no sound")
         self.dt = 0.0
-        self.speed = Settings.SPEED
+        self._speed = Settings.SPEED
         screen_info = pg.display.Info()
         size=(screen_info.current_w,screen_info.current_h)
         self.window = Window(title='flap.py', size=size, fullscreen=Settings.FULLSCREEN)
@@ -51,9 +51,20 @@ class App:
                 
         self.shake_intensity = 0
         self.shake_duration = 0
+        self.sprite_handler.reset()
         if Settings.platform=='android':
             loadingscreen.hide_loading_screen()
-      
+
+        self._bull_gamble = Bull.gamble
+
+    @property
+    def speed(self):
+        return self._speed 
+    @speed.setter
+    def speed(self, value):
+        self._speed = value
+        self.sprite_handler.update_speed(self._speed)
+
     def set_dark_mode(self,on):
         self.sprite_handler.set_dark_mode(on)
         
@@ -142,12 +153,26 @@ class App:
                 elif e.type == Settings.SHAKE_SCREEN:
                     self.shake_intensity = e.intensity
                     self.shake_duration = e.duration
-                elif e.type == Settings.INCREMENT_SPEED:
+                elif e.type == Settings.INCREMENT_SPEED and self.speed !=0:
                     self.speed += e.increment
-                    self.sprite_handler.update_speed(self.speed)
                 elif e.type == Bull.event:
-                    self.sprite_handler.bird.bull = False
-                    self.sprite_handler.bull.ready = True
+                    if e.phase==0:
+                        if random.randint(1,self._bull_gamble) == 1:
+                            pg.time.set_timer(Bull.event, 0)
+                            self._bull_gamble = Bull.gamble
+                            self.sprite_handler.bull.ready = True
+                            self.sprite_handler.group_bonus.add(self.sprite_handler.bull)
+                            # print('bull gamble succeed')
+                        else:
+                            self._bull_gamble -= 1
+                            # print('bull gamble failed')
+                    if e.phase==1:
+                        pg.event.post(pg.event.Event(Settings.INCREMENT_SPEED, increment = -Bull.speed_increment))
+                        pg.time.set_timer(pg.event.Event(Bull.event,phase=2), Bull.timeout//10)
+                    elif e.phase==2:
+                        self.sprite_handler.bird.bull = False
+                        self.sprite_handler.bull.x = self.sprite_handler.bull.orig_x
+                        pg.time.set_timer(pg.event.Event(Bull.event,phase=0), Bull.timeout)
 
     def run(self):
         while self.running:

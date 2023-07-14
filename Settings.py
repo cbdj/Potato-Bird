@@ -17,21 +17,20 @@ platform = get_platform()
 
 package_domain="com.cldejessey"
 package_name="flappy"
-try :
-    base_path = pg.system.get_pref_path(package_domain,package_name)
-except:
-    if platform=="android":
-        base_path=os.path.abspath(f"/data/data/{package_domain}.{package_name}/files/app/")
-    elif platform=="win":
-        try:
-            # PyInstaller creates a temp folder and stores path in _MEIPASS
-            base_path = sys._MEIPASS
-        except Exception:
-            base_path = os.path.abspath(".")
-    else:
+# try :
+#     base_path = pg.system.get_pref_path(package_domain,package_name)
+# except:
+if platform=="android":
+    base_path=os.path.abspath(f"/data/data/{package_domain}.{package_name}/files/app/")
+elif platform=="win":
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
         base_path = os.path.abspath(".")
+else:
+    base_path = os.path.abspath(".")
 print(f"base path : {base_path}")
-base_path = os.path.abspath(".") # A SUPPRIMER
 # Those two settings will be identified at app startup depending on screen resolution and assets dimensions
 WIN_W = 0
 WIN_H = 0
@@ -54,7 +53,7 @@ BIRD_COLOR = 'yellow'
 PIPE_DENSITY = 6
 BUMP_SPEED = 400
 FONT_SIZE = 40
-SPEED = 100 # initial pipe and base speed 
+SPEED = 120 # initial pipe and base speed 
 speed_multiplier = 1.0 # parameter that can be modified in configuration menu
 SPEED_INCREASE_FACTOR = 10 # speed increase at each day/night event
 DAY_NIGHT_TIME_MS = 10000
@@ -66,4 +65,3 @@ EVENT_AD = pg.event.custom_type()
 EVENT_SOUND = pg.event.custom_type()
 SHAKE_SCREEN = pg.event.custom_type()
 INCREMENT_SPEED = pg.event.custom_type()
-BULL_TIMEOUT = 10
