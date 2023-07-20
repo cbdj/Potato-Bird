@@ -41,11 +41,7 @@ BANNER_ID="ca-app-pub-4493613666001226/5140290547"
 TITLE = 'Potato Bird'
 FULLSCREEN= platform == "android"
 FPS = 120
-USE_OFFICIAL_ASSETS = False
-if USE_OFFICIAL_ASSETS : 
-    ASSETS_DIR_PATH = os.path.join(base_path,'official_assets')
-else:
-    ASSETS_DIR_PATH = os.path.join(base_path,'assets')
+ASSETS_DIR_PATH = os.path.join(base_path,'assets')
 SPRITE_DIR_PATH = os.path.join(ASSETS_DIR_PATH , 'sprites')
 PARTICLES_DIR_PATH = os.path.join(ASSETS_DIR_PATH , 'particles')
 AUDIO_DIR_PATH = os.path.join(ASSETS_DIR_PATH, 'audio')
