@@ -67,11 +67,7 @@ class SpriteHandler:
         offset_color(trainee,60)
         self.bird = Bird(self, self.images[Settings.BIRD_COLOR + 'bird-downflap'], self.images[Settings.BIRD_COLOR + 'bird-midflap'], self.images[Settings.BIRD_COLOR + 'bird-upflap'], Settings.WIN_W // 2, Settings.WIN_H // 2, Settings.BUMP_SPEED, Settings.BIRD_MASS_KG, trainee)
         self.bull = Bull(self, self.images['bull'],x,Settings.WIN_H//2)
-        # Creating menu
-        if Settings.USE_OFFICIAL_ASSETS:
-            self.menu = SpriteUnit(self, self.images['message'], Settings.WIN_W / 2, Settings.WIN_H / 2)
-        else:
-            self.menu = Menu(self, Settings.WIN_W / 2, Settings.WIN_H / 2, Settings.TITLE, self.images[Settings.BIRD_COLOR + 'bird-midflap'], Settings.FONT_SIZE, scale)
+        self.menu = Menu(self, Settings.WIN_W / 2, Settings.WIN_H / 2, Settings.TITLE, self.images[Settings.BIRD_COLOR + 'bird-midflap'], Settings.FONT_SIZE, scale)
         def show_leaderboard():
             if Settings.platform == 'android' and len(self.leaderboards) > 0:
                 id = list(self.leaderboards.keys())[-1]
@@ -165,11 +161,10 @@ class SpriteHandler:
         # reversing pipes
         images.update(dict([(f'reversed-{png_path.stem}', pg.transform.flip(pg.image.load(str(png_path)), False, True)) for png_path in pathlib.Path(path).rglob('*.png') if png_path.is_file() and 'pipe' in str(png_path)]))
         #
-        if not Settings.USE_OFFICIAL_ASSETS :
-            font = pg.font.Font(None, Settings.FONT_SIZE)
-            # create 'gameover' asset
-            images['gameover'] = Exfont.text_speech(font, 'GAME OVER', 'orange', True, 2, 'white')
-            # create 'message' asset
+        font = pg.font.Font(None, Settings.FONT_SIZE)
+        # create 'gameover' asset
+        images['gameover'] = Exfont.text_speech(font, 'GAME OVER', 'orange', True, 2, 'white')
+        # create 'message' asset
         return images
     
     def extend_world(self, new_width):
