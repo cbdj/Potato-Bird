@@ -15,7 +15,8 @@ class Pygame2Recipe(CompiledComponentsPythonRecipe):
 
     # version = '2.3.0'
     # url = 'https://github.com/pygame/pygame/archive/{version}.tar.gz'
-    url = 'https://github.com/cbdj/pygame-ce/archive/refs/tags/fix_android3.tar.gz'
+    version = '2.4.1'
+    url = 'https://github.com/pygame-community/pygame-ce/archive/{version}.tar.gz'
 
     site_packages_name = 'pygame-ce'
     name = 'pygame-ce'
@@ -23,9 +24,6 @@ class Pygame2Recipe(CompiledComponentsPythonRecipe):
     depends = ['sdl2', 'sdl2_image', 'sdl2_mixer', 'sdl2_ttf', 'setuptools', 'jpeg', 'png']
     call_hostpython_via_targetpython = False  # Due to setuptools
     install_in_hostpython = False
-    
-    for i in range(100):
-        print("HELLO FROM MY CUSTOM PYGAMECE RECIPE !!!!")
 
     def prebuild_arch(self, arch):
         super().prebuild_arch(arch)
@@ -52,7 +50,7 @@ class Pygame2Recipe(CompiledComponentsPythonRecipe):
                     " -L" + join(self.ctx.bootstrap.build_dir, "libs", str(arch)) +
                     " -L" + png_lib_dir + " -L" + jpeg_lib_dir + " -L" + arch.ndk_lib_dir_versioned),
                 sdl_ttf_includes="-I"+join(self.ctx.bootstrap.build_dir, 'jni', 'SDL2_ttf'),
-                sdl_image_includes="-I"+join(self.ctx.bootstrap.build_dir, 'jni', 'SDL2_image'),
+                sdl_image_includes="-I"+join(self.ctx.bootstrap.build_dir, 'jni', 'SDL2_image','include'),
                 sdl_mixer_includes=sdl_mixer_includes,
                 jpeg_includes="-I"+jpeg_inc_dir,
                 png_includes="-I"+png_inc_dir,

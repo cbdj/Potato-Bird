@@ -15,8 +15,5 @@ class PygameMenuRecipe(PythonRecipe):
     name = 'pygame_menu'
     depends = ['setuptools']
     call_hostpython_via_targetpython = False
-    
-    for i in range(10):
-        print("HELLO FROM MY CUSTOM pygame_menu RECIPE !!!!")
 
 recipe = PygameMenuRecipe()

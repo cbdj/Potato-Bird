@@ -103,16 +103,16 @@ android.permissions = INTERNET, ACCESS_NETWORK_STATE, AD_ID
 #android.features = android.hardware.usb.host
 
 # (int) Target Android API, should be as high as possible.
-android.api = 33
+android.api = 34
 
 # (int) Minimum API your APK / AAB will support.
 #android.minapi = 21
 
 # (int) Android SDK version to use
-#android.sdk = 33
+android.sdk = 34
 
 # (str) Android NDK version to use
-android.ndk = 25b
+android.ndk = 26d
 
 # (int) Android NDK API to use. This is the minimum API your app will support, it should usually match android.minapi.
 #android.ndk_api = 21
@@ -203,7 +203,7 @@ android.add_src = Android/java
 #android.add_resources =
 
 # (list) Gradle dependencies to add
-android.gradle_dependencies = com.google.android.gms:play-services-ads:22.1.0,com.google.gms:google-services:4.3.15,androidx.work:work-runtime:2.8.0,androidx.fragment:fragment:1.5.5,com.google.android.gms:play-services-games-v2:17.0.0,com.google.android.gms:play-services-tasks:18.0.2
+android.gradle_dependencies = com.google.android.gms:play-services-ads:23.0.0,com.google.gms:google-services:4.4.1,androidx.work:work-runtime:2.9.0,androidx.fragment:fragment:1.7.1,com.google.android.gms:play-services-games-v2:20.0.0,com.google.android.gms:play-services-tasks:18.1.0
 
 # (bool) Enable AndroidX support. Enable when 'android.gradle_dependencies'
 # contains an 'androidx' package, or any package from Kotlin source.

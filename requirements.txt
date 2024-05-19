@@ -1,0 +1,2 @@
+pygame-ce
+git+https://github.com/cbdj/pygame-menu
