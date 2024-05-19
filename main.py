@@ -18,7 +18,7 @@ import random
 from pygame._sdl2.video import Texture
 from Sprites.Bull import Bull
 
-__version__ = "1.4.0"
+__version__ = "1.4.1"
 class App:
     def __init__(self):
         if Settings.platform=='android':
